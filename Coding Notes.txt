@@ -135,7 +135,23 @@ Code:
 	if _name_ = "_main_"
 		argument = 0
 		number_to_string(argument)
-		
+___________________________________________________________________________
+Dictionaries
+Notes:
+    Just like in C/C++ you would use #define to macro everything
+    In Python there is no code to implement that but there are dictionaries
+    that you can use.
+
+Code:
+    thisdict = {
+        "brand": "Ford",
+        "model": "Mustang",
+        "year": 1964
+    }
+
+    # to access that value we do
+
+    thisdict["brand"]
 ___________________________________________________________________________
 AD8302 Notes:
 	As for the AD8302, the Phase Difference graph shows a parabolic function. This is unadvantageous
@@ -146,3 +162,5 @@ AD8302 Notes:
 Code Notes:
 	For this project we will be using the phase at difference originally set at 90 degrees which is looking 12 o'clock
     This will cover the whole sweep of direction which that we are just looking right in front of us.
+
+

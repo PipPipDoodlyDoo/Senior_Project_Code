@@ -13,3 +13,10 @@ PA_main = {
 Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))              # Init Phase ADC Pin
 Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))             # Init Mag ADC Pin
 
+# Might want to work on a calibration stage
+
+# This will be the forever loop
+while True:
+    # Run the ADC Measurements
+    # Calculate the Phase Array
+    # Display direction to user

@@ -1,6 +1,6 @@
 Trivial Notes:
 PRINT
-	print("stirng ", variable)					# Didnt need the +str() function	
+	print("string ", variable)					# Didn't need the +str() function
 	
 Functions:
 	for a while loop or for loop there are no {} to define the scope of the function
@@ -36,11 +36,11 @@ Pin Notes (https://docs.micropython.org/en/latest/library/machine.Pin.html):
 	The LED is on pin 25
 	
 Code:
-from machine import Pin             			# Importanting the python library
+from machine import Pin             			# Importing the python library
 
 LED = Pin(25, Pin.OUT)							# Initializing the Pin directionality and number to variable LED
 LED.value(1)									# Set the led pin high
-LED.value(0)									# Set the Led pin Low
+LED.value(0)									# Set the LED pin Low
 __________________________________________________________________________________________
 
 Analog-to-Digital Converter
@@ -60,8 +60,8 @@ Notes:
 
 Code:
 	from machine import ADC, Pin				# Including the library to the project
-	adc = ADC(Pin(26))							# Initializing Pin 26 to do ADC
-	adc.read_u16()								# Read the pin
+	ADC = ADC(Pin(26))							# Initializing Pin 26 to do ADC
+	ADC.read_u16()								# Read the ADC pin
 	
 More Notes:
 	For more control use ADCBlock (Don't know if Pycharm supports this in its package
@@ -86,7 +86,7 @@ ___________________________________________________________________________
 Threading
 
 Description: 
-	This is running multiple instructions of code simutaneously. Within the circuitdigest documentation of 
+	This is running multiple instructions of code simultaneously. Within the circuitdigest documentation of
 	"multicore" processing, it says that there is one thread per core for the RP2040.
 	
 	(https://circuitdigest.com/microcontroller-projects/dual-core-programming-on-raspberry-pi-pico-using-micropython)
@@ -103,19 +103,19 @@ Code:
 ___________________________________________________________________________
 How to use functions and global:
 Notes:
-	On the maing script they are Global functions. But if you want to change variables value 
+	On the main script they are Global functions. But if you want to change variables value
 	you would have to use the global command.
 	
 code:
 	import math
-	x = 1							# Arbatrary value
+	x = 1							# Arbitrary value
 	
 	def change value
 		x = 2						# This will change the value of x within the function
 									# as soon as function is over it changes back to 1
 		global x 					# For Pycharm you have to define the Global variable then write to it
 		
-		x = 3						# this changes x value within and outside of the function
+		x = 3						# this changes x value internally and externally of the function
 		
 ___________________________________________________________________________
 Switch Case
@@ -154,8 +154,8 @@ Code:
     thisdict["brand"]
 ___________________________________________________________________________
 AD8302 Notes:
-	As for the AD8302, the Phase Difference graph shows a parabolic function. This is unadvantageous
-		because at 0 degrees we do now know whether this is postive or negative phase shift
+	As for the AD8302, the Phase Difference graph shows a parabolic function. This is un-advantageous
+		because at 0 degrees we do now know whether this is positive or negative phase shift
 	If we can craft the hardware components to have a default of 90 phase shift then we can use that slope.
 		Ideally it should cover the 90 degree phase shift
 	

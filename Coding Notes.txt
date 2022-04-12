@@ -1,0 +1,147 @@
+Trivial Notes:
+PRINT
+	print("stirng ", variable)					# Didnt need the +str() function	
+	
+Functions:
+	for a while loop or for loop there are no {} to define the scope of the function
+	instead they use indentation.
+	
+	Example:
+		for x in range (21):					# They use Semicolon to start the for loop.
+			i = x+i						
+			
+Formatting
+	for ADC when displaying the Analog Voltage & want to show only 2 decimal on print
+	use print('{:.2f}'.format(variable))
+___________________________________________________________________________
+For a basic GPIO
+
+Pin Notes (https://docs.micropython.org/en/latest/library/machine.Pin.html):
+    Can be used as input or output
+		output_p#_name = Pin(#,Pin.OUT)			# Set GPIO Output
+		output_p#_name = Pin(#,Pin.IN)			# Set GPIO Input
+	
+
+	There is a Pull_UP or Pull_DOWN Resistor Functionality
+		P#_name = Pin(#, Pin.IN, Pin.PULL_UP)	# Set GPIO Input to Pull Up
+		P#_name = Pin(#, Pin.IN, Pin.PULL_DOWN)	# Set GPIO Input to Pull Down
+	
+	Set the !OUTPUT! GPIO High or LOW
+		output_p#_name.value(1)					# Set Output Pin High
+		output_p#_name.value(0)					# Set Output Pin Low
+		
+	You can reconfigure the pin
+		reference the document
+	
+	The LED is on pin 25
+	
+Code:
+from machine import Pin             			# Importanting the python library
+
+LED = Pin(25, Pin.OUT)							# Initializing the Pin directionality and number to variable LED
+LED.value(1)									# Set the led pin high
+LED.value(0)									# Set the Led pin Low
+__________________________________________________________________________________________
+
+Analog-to-Digital Converter
+
+Notes:
+	There are 3 channels for external ADC use:
+		[0, 1, 2]
+	The 4th channel is used for internal temperature
+	
+	The correlating pins for ADC are:
+		[26, 27, 28]
+	
+		import machine
+	
+	FOR THIS YOU JUST USE:
+		adc.read_u16()							# This should give a 16 bit digital voltage
+
+Code:
+	from machine import ADC, Pin				# Including the library to the project
+	adc = ADC(Pin(26))							# Initializing Pin 26 to do ADC
+	adc.read_u16()								# Read the pin
+	
+More Notes:
+	For more control use ADCBlock (Don't know if Pycharm supports this in its package
+		
+Code:
+	from machine import ADCBlock
+
+	block = ADCBlock(id, bits=12)  				# create an ADCBlock with 12-bit resolution
+	adc = block.connect(4, pin)    				# connect channel 4 to the given pin
+	val = adc.read_uv()            				# read an analog value
+
+Notes for Coding:
+	I think the formula from converting the digital value back to analog is:
+		Analog = Reference_Voltage / (2^N - 1) * Digital_Value
+		
+	The reference voltage for Raspberry Pi Pico is 3.3V
+	N is 16 because of "read_U16" meaning 16-bits therefore N is 65536
+	The denominator is total 65535
+	Digital value is ADC Reading
+	
+___________________________________________________________________________
+Threading
+
+Description: 
+	This is running multiple instructions of code simutaneously. Within the circuitdigest documentation of 
+	"multicore" processing, it says that there is one thread per core for the RP2040.
+	
+	(https://circuitdigest.com/microcontroller-projects/dual-core-programming-on-raspberry-pi-pico-using-micropython)
+	
+Notes:
+	Library to access "multicore" or threading is "_thread" so the code to import would look like
+		import _thread
+	https://mpython.readthedocs.io/en/master/library/micropython/_thread.html						# URL to view the library package content
+	
+	I think the second thread (Core 1) would just be running the ADC intakes and writing to the memory via pointer
+		
+Code:
+	_thread.start_new_thread(function,arg())
+___________________________________________________________________________
+How to use functions and global:
+Notes:
+	On the maing script they are Global functions. But if you want to change variables value 
+	you would have to use the global command.
+	
+code:
+	import math
+	x = 1							# Arbatrary value
+	
+	def change value
+		x = 2						# This will change the value of x within the function
+									# as soon as function is over it changes back to 1
+		global x 					# For Pycharm you have to define the Global variable then write to it
+		
+		x = 3						# this changes x value within and outside of the function
+		
+___________________________________________________________________________
+Switch Case
+Notes:
+	It says that for Python 3.10+ we can use match argument
+	
+Code:
+	def number_to_string(argument):
+		match argument:
+			case 0:
+				return "zero"
+			case 1:
+				return "one"
+			case 2:
+				return "two
+	
+	if _name_ = "_main_"
+		argument = 0
+		number_to_string(argument)
+		
+___________________________________________________________________________
+AD8302 Notes:
+	As for the AD8302, the Phase Difference graph shows a parabolic function. This is unadvantageous
+		because at 0 degrees we do now know whether this is postive or negative phase shift
+	If we can craft the hardware components to have a default of 90 phase shift then we can use that slope.
+		Ideally it should cover the 90 degree phase shift
+	
+Code Notes:
+	

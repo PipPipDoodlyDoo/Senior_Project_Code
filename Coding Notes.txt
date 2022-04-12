@@ -144,4 +144,5 @@ AD8302 Notes:
 		Ideally it should cover the 90 degree phase shift
 	
 Code Notes:
-	For this project
+	For this project we will be using the phase at difference originally set at 90 degrees which is looking 12 o'clock
+    This will cover the whole sweep of direction which that we are just looking right in front of us.

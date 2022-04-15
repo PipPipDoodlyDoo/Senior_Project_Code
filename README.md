@@ -1,2 +1,6 @@
-# Senior_Project_Code
-Using Raspberry Pi Pico with Micro python to develop phase array analysis
+Senior_Project_Code
+Developers: Ernie Lozano, Kevin Nguyen
+
+This file will be to document any discoveries and what has been done.
+ 
+

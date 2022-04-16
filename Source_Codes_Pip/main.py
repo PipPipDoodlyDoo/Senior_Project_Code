@@ -1,5 +1,5 @@
 # Overhead Main codes that the Raspberry Pi will run
-import ADC_Senior_Project
+import Senior_Project
 from machine import Pin
 from machine import ADC
 
@@ -21,10 +21,11 @@ while True:
     Mag_volt = Mag_adc_pin.read_u16()
 
     # Convert both digital value to analog
-    Ph_volt  = ADC_Senior_Project.dig_2_ana(Ph_volt)
-    Mag_volt = ADC_Senior_Project.dig_2_ana(Mag_volt)
+    Ph_volt  = Senior_Project.dig_2_ana(Ph_volt)
+    Mag_volt = Senior_Project.dig_2_ana(Mag_volt)
 
     # Use the conversion formula for voltage -> Phase & Mag
+
 
     # Calculate the Phase Array
 

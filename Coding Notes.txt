@@ -153,6 +153,11 @@ Code:
 
     thisdict["brand"]
 ___________________________________________________________________________
+Lists
+    This can be utilize with organizing the old data and comapring it to the new
+    Mostly during the calibration stage we will check if the 2 values are increasing or decreasing
+    This will tell us what end of the slope we are on.
+___________________________________________________________________________
 AD8302 Notes:
 	As for the AD8302, the Phase Difference graph shows a parabolic function. This is un-advantageous
 		because at 0 degrees we do now know whether this is positive or negative phase shift

@@ -10,6 +10,9 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/Pip_code" />
+      <excludeFolder url="file://$MODULE_DIR$/Test_Codes" />
+      <excludeFolder url="file://$MODULE_DIR$/u2f File Micropython" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

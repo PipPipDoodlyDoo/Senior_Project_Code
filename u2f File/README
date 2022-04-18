@@ -1,0 +1,3 @@
+This is the Micropython uf2 file. (Version 1.18)
+
+While holding the Boot button onboard the Pico, plug in the USB or Micro-USB to initiate the folder explorer. Copy and Paste the file into the Raspberry Pi Pico drive.

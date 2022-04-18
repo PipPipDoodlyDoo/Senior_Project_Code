@@ -1,5 +1,5 @@
 # This code will flash the on-board LED to make sure that the board is functioning properly
-from machine import Pin as pin      # Import the Pin functionality
+from machine import Pin             # Import the Pin functionality
 import utime                        # Import to sleep
 
 Blink_LED_lib = {
@@ -9,11 +9,10 @@ Blink_LED_lib = {
 
 # LED pin to turn on and off is Pin 25
 
-LED_pin = Pin(Blink_LED_lib["LED_Pin"], pin.OUT)  # Initialize Pin
+LED_pin = Pin(Blink_LED_lib["LED_Pin"], Pin.OUT)  # Initialize Pin
 i = 1                       # Initialize Counter
 
 while True:
-    print('hi')
     if i == 1:
         LED_pin.value(1)    # turn on LED
         print('LED on asd')     # print to REPL Terminal

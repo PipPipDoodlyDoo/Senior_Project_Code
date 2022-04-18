@@ -33,7 +33,7 @@ while True:
     #Mag_volt = Senior_Project.dig_2_ana(Mag_volt)
 
 
-    utime.sleep(2)
+
     # Use the conversion formula for voltage -> Phase & Mag
 
 
@@ -41,3 +41,5 @@ while True:
 
 
     # Display direction to user
+
+    utime.sleep(2)

@@ -8,7 +8,7 @@ Locate the u2f file for Micropython called "u2f File Micropython". Follow the in
     1. Before pulling in the Micro-USB to the Pico or USB to desktop, hold down the boot button. 
         This should open folder explorer, and you should see the Raspberry Pi Pico drive. 
     2. Drag and Drop the u2f file in that drive.
-        (You should not be able to see that drive available any more within File Explorer)
+        (You should not be able to see that drive available within File Explorer)
 
 Starting up Pycharm GitHub style:
     1. Go to get from VCS
@@ -55,3 +55,18 @@ You can use the local terminal to see print functions as well
     1. Under "Tools" -> "MicroPython" -> Select "MicroPython REPL"
         (REPL: Read-evaluation-print loop)
     (If you want to Flash an updated/a new code then you would have to manually exit the terminal by clicking the 'x')
+
+Workspace Etti-quite:
+    Before committing and pushing your workspace, please make sure that your source code that is being worked on is within a Directory.
+    
+ANY SOURCE FILE OUTSIDE NOT WITHIN DIRECTORY FOLDER WILL BE DELETED.
+
+    When working on your individual source code, it is highly advise to do it within your directory. When ready to test and launch, "Copy and Paste" 
+    to the overall Folder, then Flash the entire folder. As discussed before, the extra directories should be marked Red (Excluded) and will not
+    be flashed into the Raspberry Pi Pico. 
+    
+Additional Documents:
+    Within this README Directory is a file called Coding Notes. This should explain most of the syntax of python 3.10 that isued within this project
+    The Directory Test_Codes will be composed of individual directories. As said before, the Raspberry Pi Pico needs a main.py file to run
+    therefore we composed main.py files that call on additional source file. (This an attempt to get the user to be familiar with
+    "Copy and Pasting" the code onto the overall Folder and Flashing the Pico). 

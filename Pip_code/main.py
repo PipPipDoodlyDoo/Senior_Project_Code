@@ -6,7 +6,7 @@ import utime
 
 led = Pin(25, Pin.OUT)
 led.value(0)
-print("hi")
+
 
 # This will be the dictionary for the main script
 PA_main = {

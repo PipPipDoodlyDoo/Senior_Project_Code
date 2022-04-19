@@ -5,7 +5,6 @@ from machine import Pin
 from machine import ADC
 import utime  # allow the board to sleep in between samples
 
-print('hi')
 ADC_Test_lib = {
     "CHANNEL_0": 26,
     "CHANNEL_1": 27,

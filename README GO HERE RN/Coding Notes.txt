@@ -169,6 +169,11 @@ Code:
         print(x)
 
 ___________________________________________________________________________
+Logic Operators
+Notes:
+    you can run multiple checks on a
+___________________________________________________________________________
+
 AD8302 Notes:
 	As for the AD8302, the Phase Difference graph shows a parabolic function. This is un-advantageous
 		because at 0 degrees we do now know whether this is positive or negative phase shift

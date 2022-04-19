@@ -25,9 +25,9 @@ mag_mes = []                                            # Don't know if we'll ne
 cal_prog = 0                                            # use to jump out of calibration process
 
 # Indicate to the user that the Initialization is done
-print("Intialization is complete!")
+print("Initialization is complete!")
 
-# Calibrartion
+# Calibration
 
 
 

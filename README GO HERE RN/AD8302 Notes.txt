@@ -1,0 +1,19 @@
+For the Evaluation board, The top pins from left to right are:
+    1: Ground
+    2: Vpp
+    3: Ground
+
+There are also rings that are Ground and Vpp
+
+TYPICAL RATING:
+    Power Supply: 5V
+    Input Voltage: -73      to -13 dBm
+                    140 uV  to  140 mV
+
+From testing in SPL we have the functions (degree offset):
+    Lower Half (-180 -> 0):
+        y = 0.0106x + 1.878
+    Upper Half (0 -> 180):
+        y = -0.0105x + 1.8685
+
+    As we can see

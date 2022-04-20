@@ -1,6 +1,5 @@
 # Overhead Main codes that the Raspberry Pi will run
 import Senior_Project
-import Calibration
 from machine import Pin
 from machine import ADC
 import utime
@@ -40,12 +39,12 @@ print("Initialization is complete!")
 # This will be the forever loop
 while True:
     # Run the ADC Measurements
-    Ph_volt  = Ph_adc_pin.read_u16()
+    Ph_volt  = Ph_adc_pin.read_u16()                    # Measurement in Digital Voltage
 #    Mag_volt = Mag_adc_pin.read_u16()
 
 
     # Convert both digital value to analog
-    Ph_volt  = Senior_Project.dig_2_ana(Ph_volt)
+    Ph_volt  = Senior_Project.dig_2_ana(Ph_volt)        # Measurement in Analog Voltage
 #    Mag_volt = Senior_Project.dig_2_ana(Mag_volt)
 
     # Use the conversion formula for voltage -> Phase & Mag

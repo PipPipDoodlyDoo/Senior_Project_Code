@@ -185,3 +185,19 @@ Code Notes:
     This will cover the whole sweep of direction which that we are just looking right in front of us.
 
 
+___________________________________________________________________________
+Testing Notes:
+    - As for the ADC, when converting the digital to analog value for the voltage, Channel 0 (pin 26) is 20 mV higher. May need to take that
+        to consideration depending on the sensativity when it comes to the direction to heading.
+
+___________________________________________________________________________
+Implementation Notes:
+    As we sample the output AD8302 in Volts, we go from Digital Volts -> Analog Voltage -> Degrees
+    As for the heading:
+     9 o'clock: 180 to 165      6
+    10 o'clock: 165 to 135      5
+    11 o'clock: 135 to 105      4
+    12 o'clock: 105 to  75      3
+     1 o'clock:  75 to  45      2
+     2 o'clock:  45 to  15      1
+     3 o'clock:  15 to   0      0

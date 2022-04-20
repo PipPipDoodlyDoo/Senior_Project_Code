@@ -15,4 +15,8 @@ Test 1:
 		Phase (Output 1):	0 degree
 		Phase (Output 2):	varied from 0-to-360 degrees
 		
-		
+    Equations:
+        Converting the Votlage to phase offset [Volts-to-Degree]
+        y = 94.476x - 177.44
+        y = -94.786x + 177.15
+

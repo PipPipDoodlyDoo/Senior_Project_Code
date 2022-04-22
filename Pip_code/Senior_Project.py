@@ -5,7 +5,7 @@ ADC_SP = {
     "BIT_RES"   : 65535,        # Denominator for Dig-2-Analog conversion
     "REF_VOLT"  : 3.3,          # Reference Voltage
     "FREQ"      : 165500000,    # Frequency to 165.5 MHz
-    "DIST"      : 3,            # distance between antenna in meters
+    "DIST"      : 1,            # distance between antenna in meters
     "BETA"      : 3.466,        # Beta for 165.5 MHz for Phase Array Calculation
     "3 o'clock" : 0,            # These are headings
     "2 o'clock" : 1,
@@ -20,23 +20,26 @@ ADC_SP = {
 # This function will convert the digital value to analog
 def dig_2_ana(dig_value):
     analog_value = ADC_SP["REF_VOLT"] / ADC_SP["BIT_RES"] * dig_value
-    print("Analog Voltage: ", '{:2f}'.format(analog_value))
+    print("Analog Voltage: ", '{:2f}'.format(analog_value))         # print out the analog voltage
     return analog_value
 
 # Convert the analog voltage received to phase difference
 def volt_2_ph(voltage, half):
     if half == 1:
         phase = abs(-94.786 * voltage + 177.15)
+        print('Phase Offset = ', phase)
         return phase
     elif half == 0:
         phase =  abs(94.476 * voltage - 177.44)
         phase = abs(phase)
+        print('Phase Offset = ', phase)
         return phase
 
 # Calculate angle to the beacon signal
 def Phase_array_calc(phase):
-    delta_r = phase / ADC_SP["BETA"]
-    theta = math.acos(delta_r / ADC_SP["DIST"])
+    delta_r = math.radians(phase) / ADC_SP["BETA"]
+    theta = math.degrees(math.acos(delta_r / ADC_SP["DIST"]))
+    print("Theta value: ", theta)
     return theta
 
 # This will convert the heading to the user
@@ -68,20 +71,19 @@ def dir_to_heading(degree):
 
 # This will display to the user where the heading is
 def dis_head(heading):
-    match heading:
-        case 0:
-            print("Signal Located at 3 o'Clock")
-        case 1:
-            print("Signal Located at 2 o'Clock")
-        case 2:
-            print("Signal Located at 1 o'Clock")
-        case 3:
-            print("Signal Located at 12 o'Clock")
-        case 4:
-            print("Signal Located at 11 o'Clock")
-        case 5:
-            print("Signal Located at 10 o'Clock")
-        case 6:
-            print("Signal Located at 9 o'Clock")
-        case 7:
-            print("Error")
+    if heading == 0:
+        print("Signal Located at 3 o'Clock")
+    elif heading == 1:
+        print("Signal Located at 2 o'Clock")
+    elif heading == 2:
+        print("Signal Located at 1 o'Clock")
+    elif heading == 3:
+        print("Signal Located at 12 o'Clock")
+    elif heading == 4:
+        print("Signal Located at 11 o'Clock")
+    elif heading == 5:
+        print("Signal Located at 10 o'Clock")
+    elif heading == 6:
+        print("Signal Located at 9 o'Clock")
+    else:
+        print("Error")

@@ -1,3 +1,14 @@
+For the Evaluation board, The top pins from left to right are:
+    1: Ground
+    2: Vpp
+    3: Ground
+
+There are also rings that are Ground and Vpp
+
+TYPICAL RATING:
+    Power Supply: 5V
+    Input Voltage: -73      to -13 dBm
+                    140 uV  to  140 mV
 Test 1:
 	This test was conducted within the SPL using:
 		RIGOL DG1022	Function Generator
@@ -19,4 +30,3 @@ Test 1:
         Converting the Votlage to phase offset [Volts-to-Degree]
         y = 94.476x - 177.44
         y = -94.786x + 177.15
-

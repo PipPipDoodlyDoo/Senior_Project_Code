@@ -84,5 +84,5 @@ while True:
 
     # Display direction to user
     heading = Senior_Project.dir_to_heading(direction)
-    Senior_Project.dis_head(heading)
+    Senior_Project.dis_head(heading, mag_dif)
     utime.sleep(2)

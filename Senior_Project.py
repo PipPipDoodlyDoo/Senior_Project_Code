@@ -47,26 +47,35 @@ def dir_to_heading(degree, direction):
 
     if (direction >= 0):                                # Test if beacon signal is to the left
         if ((degree > 15) and (degree <= 45)):
-            return SP_LIB[""]
+            return SP_LIB["11 o'clock"]
+        elif ((degree > 45) and (degree <= 75)):
+            return SP_LIB["10 o'clock"]
+        elif ((degree > 75) and (degree <= 90)):
+            return SP_LIB["9 o'clock"]
 
-
-
+    if (direction < 0):                                 # Signal to the right
+        if ((degree > 15) and (degree <= 45)):
+            return SP_LIB["1 o'clock"]
+        elif ((degree > 45) and (degree <= 75)):
+            return SP_LIB["2 o'clock"]
+        elif ((degree > 75) and (degree <= 90)):
+            return SP_LIB["3 o'clock"]
 
 # This will display to the user where the heading is
 def dis_head(heading):
-    if heading == 0:
+    if heading == SP_LIB["3 o'clock"]:
         print("Signal Located at 3 o'Clock")
-    elif heading == 1:
+    elif heading == SP_LIB["2 o'clock"]:
         print("Signal Located at 2 o'Clock")
-    elif heading == 2:
+    elif heading == SP_LIB["1 o'clock"]:
         print("Signal Located at 1 o'Clock")
-    elif heading == 3:
+    elif heading == SP_LIB["12 o'clock"]:
         print("Signal Located at 12 o'Clock")
-    elif heading == 4:
+    elif heading == SP_LIB["11 o'clock"]:
         print("Signal Located at 11 o'Clock")
-    elif heading == 5:
+    elif heading == SP_LIB["10 o'clock"]:
         print("Signal Located at 10 o'Clock")
-    elif heading == 6:
+    elif heading == SP_LIB["9 o'clock"]:
         print("Signal Located at 9 o'Clock")
     else:
         print("Error")

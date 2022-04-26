@@ -2,17 +2,17 @@ import math
 
 # Dictionary for the source file.
 SP_LIB = {
-    "DIST"      : 1,            # distance between antennas [meters]
-    "BETA"      : 3.466,        # Beta for 165.5 MHz
-    "LAMBDA"    : 1.826,        # wavelength for 165.5 MHz
-    "3 o'clock" : 0,            # These are headings
+    "DIST"      : 1,                            # distance between antennas [meters]
+    "BETA"      : 3.466,                        # Beta for 165.5 MHz
+    "LAMBDA"    : 1.826,                        # wavelength for 165.5 MHz
+    "3 o'clock" : 0,                            # direction headings
     "2 o'clock" : 1,
     "1 o'clock" : 2,
     "12 o'clock": 3,
     "11 o'clock": 4,
     "10 o'clock": 5,
     "9 o'clock" : 6,
-    "ERROR"     : 7             # This would mean that the signal was out of phase
+    "ERROR"     : 7
 }
 
 # THIS FUNCTION WILL CONVERT THE DIGITAL VALUE TO ANALOG
@@ -43,7 +43,12 @@ def Phase_array_calc(phase):
 # USE THE INFORMATION TO SHOW USER WHERE BACON (lol) SIGNAL IS
 def dir_to_heading(degree, direction):
     if ((degree <= 15) and (degree >= 0)):
-        return
+        return SP_LIB["12 o'clock"]                     # Dont need to worry about magnitude
+
+    if (direction >= 0):                                # Test if beacon signal is to the left
+        if ((degree > 15) and (degree <= 45)):
+            return SP_LIB[""]
+
 
 
 

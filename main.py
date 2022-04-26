@@ -1,31 +1,70 @@
+# Overhead Main codes that the Raspberry Pi will run
+import Senior_Project
 from machine import Pin
-from utime import sleep
+from machine import ADC
+import utime
 
-# make the interrupt function
-def Interrupt_function(pin):           # keep this empty
-    print('From Interrupt Func')
-    global global_flag
-    global_flag = 1
+# This will be the dictionary for the main script
+PA_main = {
+    "ADC_Ch_0"      : 26,                               # 1st channel for onboard ADC
+    "ADC_Ch_1"      : 27                                # 2nd channel for onboard ADC
+}
+
+
+# Interrupt Function triggered by the in_pin
+def int_pin(in_pin):
+    global cal_prog
+    cal_prog = 1                                            # Set flag high for the calibration stage to be done
+
+# Set up the variables that will be used
+ph_mes = []                                             # This will be useful for the calibration process
+mag_mes = []                                            # Don't know if we'll need this later
+cal_prog = 0                                            # use to jump out of calibration process
+
+
+# Initialize the LED pin for debugging
+LED = Pin(25, Pin.OUT)                                  # Set the LED to output
+LED.value(0)                                            # Set the LED OFF
+
+# Initialize the GPIO Pins
+# Output Pin
+out_pin = Pin(1, Pin.OUT)
+out_pin.high()
+
+# Input Pin
+in_pin = Pin(0, Pin.IN, Pin.PULL_DOWN)  # Set the initial value to zero
+# Set_up input pin as an interupt
+in_pin.irq(trigger=Pin.IRQ_RISING,)
+
+# Initialize ADC Pins
+Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))              # Init Phase ADC Pin
+# Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))             # Init Mag ADC Pin
 
 
 
-# Initialize the pins
-LED_Pin = Pin(25, Pin.OUT)
-in_p = Pin(0, Pin.IN, Pin.PULL_DOWN) # make sure that it stays down when not button press
-out_p = Pin(1, Pin.OUT)
+# Indicate to the user that the Initialization is done
+print("Initialization is complete!")
 
-global_flag = 0
+# Calibration
 
-# Set the Output Pin high
-LED_Pin.low()
-out_p.high()
-
-# Set the input pin as interrupt
-in_p.irq(trigger=Pin.IRQ_HIGH_LEVEL, handler=Interrupt_function)
-
-# Set up a repeating system
-counter = 0
+# This will be the forever loop
 while True:
-    print('Counter value = ', counter,'\nGlobal Flag = ',global_flag)
-    counter += 1
-    sleep(1)
+    # Run the ADC Measurements
+    Ph_volt  = Ph_adc_pin.read_u16()                    # Measurement in Digital Voltage
+#    Mag_volt = Mag_adc_pin.read_u16()
+
+
+    # Convert both digital value to analog
+    Ph_volt  = Senior_Project.dig_2_ana(Ph_volt)        # Measurement in Analog Voltage
+#    Mag_volt = Senior_Project.dig_2_ana(Mag_volt)
+
+    # Use the conversion formula for voltage -> Phase & Mag
+    Ph_volt = Senior_Project.volt_2_ph(Ph_volt, 1)          # This should make Ph_volt in degrees
+
+    # Calculate the Phase Array
+    direction = Senior_Project.Phase_array_calc(Ph_volt)
+
+    # Display direction to user
+    heading = Senior_Project.dir_to_heading(direction)
+    Senior_Project.dis_head(heading)
+    utime.sleep(2)

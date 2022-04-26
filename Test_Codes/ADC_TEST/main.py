@@ -6,11 +6,13 @@ from machine import ADC
 import utime  # allow the board to sleep in between samples
 
 ADC_Test_lib = {
-    "CHANNEL_0": 26,
-    "CHANNEL_1": 27,
-    "CHANNEL_2": 28,
-    "BIT_RES": 65535,  # This is the entire denominator result for the DAC formula
-    "REF_VOLT": 3.3,  # The Pico supplies the ADC with 3.3V
+    "CHANNEL_0" : 26,
+    "CH0_CAL"   : 0.06,
+    "CHANNEL_1" : 27,
+    "CH1_CAL"   :0.05,
+    "CHANNEL_2" : 28,
+    "BIT_RES"   : 65535,  # This is the entire denominator result for the DAC formula
+    "REF_VOLT"  : 3.3,  # The Pico supplies the ADC with 3.3V
     "sleep_time": 2
 }
 
@@ -23,8 +25,10 @@ def dig_2_ana(dig_value):
 
 def print_values(d_val, a_val, i):
     if i == 0:
+        a_val = a_val - ADC_Test_lib["CH0_CAL"]
         print('\nChannel 0 values:')
     if i == 1:
+        a_val = a_val - ADC_Test_lib["CH1_CAL"]
         print('\n Channel 1 values:')
     if i == 2:
         print('\n Channel 2 values:')

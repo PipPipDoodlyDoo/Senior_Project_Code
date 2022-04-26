@@ -171,7 +171,22 @@ Code:
 ___________________________________________________________________________
 Logic Operators
 Notes:
-    you can run multiple checks on a
+    you can run multiple checks on an If Statement by using 'and'/'or'
+
+Code:
+    if ((case 1) and (case 2)):     # Pretty sure you can extend out later on and cascade test
+    if ((x > 3) or (y < 2)):
+
+___________________________________________________________________________
+Interrupt
+Notes:
+    This will be dedicated to only pin because that is what we are working with
+    The different triggers for Pin
+        -Pin.IRQ_FALLING
+        -Pin.IRQ_RISING
+        -Pin.IRQ_LOW_LEVEL
+        -Pin.IRQ_HIGH_LEVEL
+        (These values can be OR'ed together to have multiple triggers.
 ___________________________________________________________________________
 
 AD8302 Notes:
@@ -191,7 +206,24 @@ Testing Notes:
         to consideration depending on the sensativity when it comes to the direction to heading.
 
 ___________________________________________________________________________
-Implementation Notes:
+Implementation Notes
+Phase Array:
+    On the website; https://www.radartutorial.eu/06.antennas/Phased%20Array%20Antenna.en.html
+    they talked about phase array and their equation came to:
+        phi = 360 * d * sin(theta) / lambda
+            phi     ~ Phase Shift between 2 successive elements (phase difference between antenna)
+            d       ~ Distance between the antenna [meters]
+            theta   ~ beam direction
+            lambda  ~ wavelength which is 1.811 meters
+
+            *All calculation are calculations are done in degree
+
+    Now the equation to get Beam Direction from Phase shift is:
+        theta = asin((phi * lambda) / (360 * d))
+Theory:
+    If my thinking is right then the beam directoin (theta) should come from straight on.
+    Therefore the 12 o'clock direction should be 0 degree which means that this is
+Hardware:
     As we sample the output AD8302 in Volts, we go from Digital Volts -> Analog Voltage -> Degrees
     As for the heading:
      9 o'clock: 180 to 165      6

@@ -1,68 +1,86 @@
 # Overhead Main codes that the Raspberry Pi will run
-import Senior_Project
-from machine import Pin
-from machine import ADC
-import utime
+import Senior_Project                                                       # Modulating the Code
+from machine import Pin                                                     # Use for Calibration Human Interaction
+from machine import ADC                                                     # Read Voltage from AD8302
+import utime                                                                # Sleep time
 
-# This will be the dictionary for the main script
+# DICTIONARY "LIBRARY OF VARIABLES THAT WILL BE USED"
 PA_main = {
-    "ADC_Ch_0"      : 26,                               # 1st channel for onboard ADC
-    "ADC_Ch_1"      : 27                                # 2nd channel for onboard ADC
+    "ADC_Ch_0"      : 26,                                                   # Phase Channel
+    "ADC_Ch_1"      : 27,                                                   # Magnitude Channel
+    "ADC_Ch_2"      : 28                                                    # Reference Pin
 }
 
+# INTERRUPT FUNCTION TRIGGERED BY THE 'in_pin'
+def inter_pin(in_pin):                                                      # Need variable that causes interrupt
+    global cal_prog                                                         # Make sure that we can write to the flag and recognise it
+    cal_prog = 1                                                            # Set flag high for the calibration stage to be done
 
-# Interrupt Function triggered by the in_pin
-def int_pin(in_pin):
-    global cal_prog
-    cal_prog = 1                                            # Set flag high for the calibration stage to be done
+# INIT VARIABLES
+cal_prog = 0                                                                # use to jump out of calibration process
+ph_cal   = 0                                                                # Calibrated Phase Recording
+ph_mes   = 0                                                                # Measured Phase Recording
+mag_cal  = 0                                                                # Calibrated Magnitude Recording
+mag_mes  = 0                                                                # Measured Magnitude Recording
 
-# Set up the variables that will be used
-ph_mes = []                                             # This will be useful for the calibration process
-mag_mes = []                                            # Don't know if we'll need this later
-cal_prog = 0                                            # use to jump out of calibration process
+# INIT ON-BOARD LED FOR DEBUGGING
+LED = Pin(25, Pin.OUT)                                                      # Set the LED to output
+LED.low()                                                                   # Set the LED OFF
 
+# INIT OUTPUT GPIO PIN
+out_pin = Pin(1, Pin.OUT)                                                   # Set Pin 1 to Output
+out_pin.high()                                                              # Put the value high
 
-# Initialize the LED pin for debugging
-LED = Pin(25, Pin.OUT)                                  # Set the LED to output
-LED.value(0)                                            # Set the LED OFF
+# INIT INPUT GPIO PIN
+in_pin = Pin(0, Pin.IN, Pin.PULL_DOWN)                                      # Set the initial value to zero
+in_pin.irq(trigger=Pin.IRQ_RISING, handler= inter_pin)                      # Set_up input pin as an interupt and run "inter_pin" function
 
-# Initialize the GPIO Pins
-# Output Pin
-out_pin = Pin(1, Pin.OUT)
-out_pin.high()
+# INIT ADC PINS
+Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))                                  # Init Phase ADC Pin
+Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))                                 # Init Mag ADC Pin
 
-# Input Pin
-in_pin = Pin(0, Pin.IN, Pin.PULL_DOWN)  # Set the initial value to zero
-# Set_up input pin as an interupt
-in_pin.irq(trigger=Pin.IRQ_RISING,)
-
-# Initialize ADC Pins
-Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))              # Init Phase ADC Pin
-# Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))             # Init Mag ADC Pin
-
-
-
-# Indicate to the user that the Initialization is done
+# INDICATE INIT IS DONE: 'debugging
 print("Initialization is complete!")
 
-# Calibration
+# CALIBRATION PROCESS
+print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'click position.")
 
-# This will be the forever loop
+# CAPTURE ZERO VALUES OF PHASE AND MAGNITUDE OUTPUT OF AD8302
+while cal_prog == 0:                                                        # Keep capturing the zero value until user stops with button press
+    ph_cal  = Ph_adc_pin.read_u16()
+    mag_cal = Mag_adc_pin.read_u16()
+
+    ph_cal  = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_mes[0]), 1) # Convert the Digital voltage to Analog and into Phase offset [Degrees]
+
+    # DISPLAY MEASUREMENT TO THE USER
+    print('Initial Phase Offset: ', '{:2f}'.format(ph_cal))
+    utime.sleep(1)                                                          # sleep for 1 sec
+
+# MIGHT CHANGE PHASE CAL VALUE TO DEG OFFSET
+####################################################################
+# The initial value of the phase measurement should be in Degrees
+####################################################################
+
+
+
+# FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
 while True:
-    # Run the ADC Measurements
-    Ph_volt  = Ph_adc_pin.read_u16()                    # Measurement in Digital Voltage
-#    Mag_volt = Mag_adc_pin.read_u16()
+    # CAPTURE ADC MEAS
+    ph_mes  = Ph_adc_pin.read_u16()                                         # Measurement in Digital Voltage
+    mag_mes = Mag_adc_pin.read_u16()
 
+    # CONVERT PHASE DIGITAL VALUE TO ANALOG
+    ph_mes = Senior_Project.dig_2_ana(ph_mes)                               # Measurement in Analog Voltage
 
-    # Convert both digital value to analog
-    Ph_volt  = Senior_Project.dig_2_ana(Ph_volt)        # Measurement in Analog Voltage
-#    Mag_volt = Senior_Project.dig_2_ana(Mag_volt)
+    # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
+    ph_mes = Senior_Project.volt_2_ph(ph_mes, 1)                            # This should make ph_mes in degrees
 
-    # Use the conversion formula for voltage -> Phase & Mag
-    Ph_volt = Senior_Project.volt_2_ph(Ph_volt, 1)          # This should make Ph_volt in degrees
+    # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
+    ph_dif  = abs(ph_cal - ph_mes)                                           # Calculate the phase
+    mag_dif = mag_cal - mag_mes
 
-    # Calculate the Phase Array
-    direction = Senior_Project.Phase_array_calc(Ph_volt)
+    # CALCULATE PHASE ARRAY
+    direction = Senior_Project.Phase_array_calc(ph_dif)
 
     # Display direction to user
     heading = Senior_Project.dir_to_heading(direction)

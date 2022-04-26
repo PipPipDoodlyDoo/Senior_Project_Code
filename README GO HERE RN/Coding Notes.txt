@@ -233,3 +233,14 @@ Hardware:
      1 o'clock:  75 to  45      2
      2 o'clock:  45 to  15      1
      3 o'clock:  15 to   0      0
+
+___________________________________________________________________________
+Notes to do:
+    -[] Later whether we use a LCD or a UART Terminal, all the print would change to
+        Serial writes. "writing to the user"
+    -[] During the Calibration values we have initial zero and we can find the degree offset from 2 successive elements and
+        then with the Magnitude output ratio we can find
+    -[] We will compare the difference of phase offset between the measured and calibrated value.
+    -[] May have to incorporate another ADC for the reference Output of AD8302
+    -[] With finding whether the direction is left or right with using magnitude difference. If postive then INPA is higher than INPB
+        In a scenario, left antenna is INPA then this would mean the collar is in the left hand plane.

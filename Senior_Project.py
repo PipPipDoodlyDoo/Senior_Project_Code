@@ -1,13 +1,10 @@
 import math
 
 # Dictionary for the source file.
-ADC_SP = {
-    "BIT_RES"   : 65535,        # Denominator for Dig-2-Analog conversion
-    "REF_VOLT"  : 3.3,          # Reference Voltage
-    "ANA_ADJ"   : 0.04,         # THis is to adjust the analog value.
-    "FREQ"      : 165500000,    # Frequency to 165.5 MHz
-    "DIST"      : 1,            # distance between antenna in meters
-    "BETA"      : 3.466,        # Beta for 165.5 MHz for Phase Array Calculation
+SP_LIB = {
+    "DIST"      : 1,            # distance between antennas [meters]
+    "BETA"      : 3.466,        # Beta for 165.5 MHz
+    "LAMBDA"    : 1.826,        # wavelength for 165.5 MHz
     "3 o'clock" : 0,            # These are headings
     "2 o'clock" : 1,
     "1 o'clock" : 2,
@@ -18,14 +15,14 @@ ADC_SP = {
     "ERROR"     : 7             # This would mean that the signal was out of phase
 }
 
-# This function will convert the digital value to analog
+# THIS FUNCTION WILL CONVERT THE DIGITAL VALUE TO ANALOG
 def dig_2_ana(dig_value):
-    analog_value = ADC_SP["REF_VOLT"] / ADC_SP["BIT_RES"] * dig_value
-    analog_value = analog_value - ADC_SP["ANA_ADJ"]                     # Calibration: ADC reads 0.02 values higher
+    analog_value = SP_LIB["REF_VOLT"] / SP_LIB["BIT_RES"] * dig_value
+    analog_value = analog_value - SP_LIB["ANA_ADJ"]                     # Calibration: ADC reads 0.02 values higher
     print("\nAnalog Voltage: ", '{:2f}'.format(analog_value))         # print out the analog voltage
     return analog_value
 
-# Convert the analog voltage received to phase difference
+# CONVERT ANALOG VOLTAGE TO PHASE ACCORDING TO AD8302 (really can use either or)
 def volt_2_ph(voltage, half):
     if half == 1:
         phase = abs(-94.786 * voltage + 177.15)
@@ -37,38 +34,17 @@ def volt_2_ph(voltage, half):
         print('Phase Offset = ', phase)
         return phase
 
-# Calculate angle to the beacon signal
+# CALCULATE ANGEL OF PLANE'S TRAVELING DIRECTION TO BEACON SIGNAL POSITION
 def Phase_array_calc(phase):
-    delta_r = math.radians(phase) / ADC_SP["BETA"]
-    theta = math.degrees(math.acos(delta_r / ADC_SP["DIST"]))
-    print("Theta value: ", theta)
+    theta = math.asin(math.radians((phase * SP_LIB["LAMBDA"]) / (360 * SP_LIB["DIST"])))
+    theta = math.degrees(theta)
     return theta
 
-# This will convert the heading to the user
-def dir_to_heading(degree):
-    # 3 o'clock heading
-    if ((degree >= 0) and (degree <= 15)):
-        return ADC_SP["3 o'clock"]
-    # 2 o'clock heading
-    elif ((degree >= 15) and (degree <= 45)):
-        return ADC_SP["2 o'clock"]
-    # 1 o'clock heading
-    elif ((degree >= 45) and (degree <= 75)):
-        return ADC_SP["1 o'clock"]
-    # 12 o'clock heading
-    elif ((degree >= 75) and (degree <= 105)):
-        return ADC_SP["12 o'clock"]
-    # 11 o'clock heading
-    elif ((degree >= 105) and (degree <= 135)):
-        return ADC_SP["11 o'clock"]
-    # 10 o'clock heading
-    elif ((degree >= 135) and (degree <= 165)):
-        return ADC_SP["10 o'clock"]
-    # 9 o'clock heading
-    elif ((degree >= 165) and (degree <= 180)):
-        return ADC_SP["9 o'clock"]
-    else:
-        return ADC_SP["ERROR"]
+# USE THE INFORMATION TO SHOW USER WHERE BACON (lol) SIGNAL IS
+def dir_to_heading(degree, direction):
+    if ((degree <= 15) and (degree >= 0)):
+        return
+
 
 
 # This will display to the user where the heading is

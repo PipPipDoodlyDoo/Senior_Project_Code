@@ -2,6 +2,8 @@ import math
 
 # Dictionary for the source file.
 SP_LIB = {
+    "REF_VOLT"  : 3.3,                          # Reference Voltage for ADC
+    "BIT_RES"   : 65535,                        # Bit Resolution for ADC
     "DIST"      : 1,                            # distance between antennas [meters]
     "BETA"      : 3.466,                        # Beta for 165.5 MHz
     "LAMBDA"    : 1.826,                        # wavelength for 165.5 MHz
@@ -18,7 +20,6 @@ SP_LIB = {
 # THIS FUNCTION WILL CONVERT THE DIGITAL VALUE TO ANALOG
 def dig_2_ana(dig_value):
     analog_value = SP_LIB["REF_VOLT"] / SP_LIB["BIT_RES"] * dig_value
-    analog_value = analog_value - SP_LIB["ANA_ADJ"]                     # Calibration: ADC reads 0.02 values higher
     print("\nAnalog Voltage: ", '{:2f}'.format(analog_value))         # print out the analog voltage
     return analog_value
 

@@ -244,3 +244,4 @@ Notes to do:
     -[] May have to incorporate another ADC for the reference Output of AD8302
     -[] With finding whether the direction is left or right with using magnitude difference. If postive then INPA is higher than INPB
         In a scenario, left antenna is INPA then this would mean the collar is in the left hand plane.
+    -[] Need to worry about if i hit the maximum output of phase pin which is in-phase input.

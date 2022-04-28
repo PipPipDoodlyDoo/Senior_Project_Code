@@ -40,8 +40,8 @@ in_pin = Pin(PA_main["IN_PIN"], Pin.IN, Pin.PULL_DOWN)                          
 in_pin.irq(trigger=Pin.IRQ_RISING, handler= inter_pin)                      # Set_up input pin as an interupt and run "inter_pin" function
 
 # INIT ADC PINS
-Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))                                  # Init Phase ADC Pin
-Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))                                 # Init Mag ADC Pin
+Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))                                  # Init Phase ADC Pin
+Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))                                 # Init Mag ADC Pin
 
 # INDICATE INIT IS DONE: 'debugging
 print("Initialization is complete!")
@@ -82,11 +82,13 @@ while True:
 
     # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
     ph_dif  = abs(ph_cal - ph_mes)                                           # Calculate the phase
+    print('Phase Difference: ', ph_dif)
     mag_dif = mag_cal - mag_mes
+    print('Magnitude Difference: ',mag_dif)
 
     # CALCULATE PHASE ARRAY
     theta = Senior_Project.Phase_array_calc(ph_dif)
-
+    print('Theta: ', theta)
     # Display direction to user
     heading = Senior_Project.dir_to_heading(theta, mag_dif)
     Senior_Project.dis_head(heading)

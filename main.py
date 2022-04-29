@@ -78,7 +78,7 @@ while True:
     ph_mes = Senior_Project.dig_2_ana(ph_mes)                               # Measurement in Analog Voltage
 
     # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
-    ph_mes = Senior_Project.volt_2_ph(ph_mes, 1)                            # This should make ph_mes in degrees
+    ph_mes = Senior_Project.volt_2_ph(ph_mes, 0)                            # This should make ph_mes in degrees
 
     # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
     ph_dif  = abs(ph_cal - ph_mes)                                           # Calculate the phase

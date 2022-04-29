@@ -1,0 +1,489 @@
+This test data was conducted in the Microwave lab using the ZOS-200+ (VCO) to generate the 165.5 MHz Frequency.
+The antenna was using the Yagi-uda.
+Additional Conponents:
+    AD8302 phase difference and Gain detector (whatever it is called)
+    SMA Male-to-male
+    DC Power Supply (E3630A)
+    manufactured BPF and Copper Tape Ribbon Dipole
+
+
+MPY: soft reboot
+Initialization is complete!
+Begin Calibration Process.
+ Please place the Transmitter in the 12 o'click position.
+
+Analog Voltage:  1.315972
+Phase Offset =  52.41431
+Initial Phase Offset:  52.414308
+Calibration flag:  0
+
+Analog Voltage:  1.272465
+Phase Offset =  56.53811
+Initial Phase Offset:  56.538110
+Calibration flag:  0
+
+Analog Voltage:  1.373980
+Phase Offset =  46.91589
+Initial Phase Offset:  46.915894
+Calibration flag:  0
+
+Analog Voltage:  1.438434
+Phase Offset =  40.80655
+Initial Phase Offset:  40.806551
+Calibration flag:  0
+
+Analog Voltage:  1.384454
+Phase Offset =  45.92313
+Initial Phase Offset:  45.923128
+Calibration flag:  0
+
+Analog Voltage:  1.493271
+Phase Offset =  35.60883
+Initial Phase Offset:  35.608826
+Calibration flag:  0
+
+Analog Voltage:  1.615734
+Phase Offset =  24.00107
+Initial Phase Offset:  24.001069
+Calibration flag:  0
+
+Analog Voltage:  1.712465
+Phase Offset =  14.83228
+Initial Phase Offset:  14.832276
+Calibration flag:  0
+
+Analog Voltage:  1.158009
+Phase Offset =  67.38698
+Initial Phase Offset:  67.386980
+Calibration flag:  0
+
+Analog Voltage:  1.386065
+Phase Offset =  45.7704
+Initial Phase Offset:  45.770402
+Calibration flag:  0
+
+Analog Voltage:  0.814690
+Phase Offset =  99.92881
+Initial Phase Offset:  99.928808
+Calibration flag:  0
+
+Analog Voltage:  0.915450
+Phase Offset =  90.37818
+Initial Phase Offset:  90.378180
+Calibration flag:  0
+
+Analog Voltage:  0.877583
+Phase Offset =  93.96742
+Initial Phase Offset:  93.967419
+Calibration flag:  0
+
+Analog Voltage:  1.030661
+Phase Offset =  79.45771
+Initial Phase Offset:  79.457712
+Calibration flag:  0
+
+Analog Voltage:  1.050048
+Phase Offset =  77.62014
+Initial Phase Offset:  77.620139
+Calibration flag:  0
+
+Analog Voltage:  1.044408
+Phase Offset =  78.1547
+Initial Phase Offset:  78.154702
+Calibration flag:  0
+
+Analog Voltage:  0.795354
+Phase Offset =  101.7616
+Initial Phase Offset:  101.761603
+Calibration flag:  0
+
+Analog Voltage:  0.408528
+Phase Offset =  138.4272
+Initial Phase Offset:  138.427234
+Calibration flag:  0
+
+Analog Voltage:  0.476255
+Phase Offset =  132.0076
+Initial Phase Offset:  132.007647
+Calibration flag:  0
+
+Analog Voltage:  0.535876
+Phase Offset =  126.3565
+Initial Phase Offset:  126.356494
+Calibration flag:  0
+
+Analog Voltage:  0.453696
+Phase Offset =  134.1459
+Initial Phase Offset:  134.145916
+Calibration flag:  0
+
+Analog Voltage:  0.535876
+Phase Offset =  126.3565
+Initial Phase Offset:  126.356494
+Calibration flag:  0
+
+Analog Voltage:  0.551183
+Phase Offset =  124.9055
+Initial Phase Offset:  124.905527
+Calibration flag:  0
+
+Analog Voltage:  0.543127
+Phase Offset =  125.6692
+Initial Phase Offset:  125.669193
+Calibration flag:  0
+from interrupt
+
+Analog Voltage:  0.498009
+Phase Offset =  130.3901
+Phase Difference:  4.72094
+Magnitude Difference:  -176
+Theta:  1.65049
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.948482
+Phase Offset =  87.83118
+Phase Difference:  37.83802
+Magnitude Difference:  3697
+Theta:  13.34713
+Signal Located at 12 o'Clock
+
+Analog Voltage:  1.013742
+Phase Offset =  81.6657
+Phase Difference:  44.0035
+Magnitude Difference:  3665
+Theta:  15.57299
+Signal Located at 11 o'Clock
+
+Analog Voltage:  0.660806
+Phase Offset =  115.0097
+Phase Difference:  10.65946
+Magnitude Difference:  5474
+Theta:  3.728775
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.765544
+Phase Offset =  105.1145
+Phase Difference:  20.55469
+Magnitude Difference:  7954
+Theta:  7.204106
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.096681
+Phase Offset =  168.3059
+Phase Difference:  42.63676
+Magnitude Difference:  -1408
+Theta:  15.07761
+Signal Located at 1 o'Clock
+
+Analog Voltage:  0.745402
+Phase Offset =  107.0174
+Phase Difference:  18.65176
+Magnitude Difference:  10419
+Theta:  6.534105
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.178054
+Phase Offset =  160.6181
+Phase Difference:  34.94894
+Magnitude Difference:  12051
+Theta:  12.31134
+Signal Located at 12 o'Clock
+
+Analog Voltage:  1.216823
+Phase Offset =  62.47944
+Phase Difference:  63.18976
+Magnitude Difference:  6034
+Theta:  22.67611
+Signal Located at 11 o'Clock
+
+Analog Voltage:  0.973458
+Phase Offset =  85.47155
+Phase Difference:  40.19765
+Magnitude Difference:  3809
+Theta:  14.19639
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.980709
+Phase Offset =  84.78649
+Phase Difference:  40.88271
+Magnitude Difference:  3521
+Theta:  14.44353
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.979904
+Phase Offset =  84.86261
+Phase Difference:  40.80659
+Magnitude Difference:  4113
+Theta:  14.41606
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.958151
+Phase Offset =  86.91777
+Phase Difference:  38.75143
+Magnitude Difference:  3505
+Theta:  13.67551
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.958956
+Phase Offset =  86.84165
+Phase Difference:  38.82755
+Magnitude Difference:  4209
+Theta:  13.70289
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.901753
+Phase Offset =  92.24597
+Phase Difference:  33.42323
+Magnitude Difference:  5794
+Theta:  11.76602
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.966207
+Phase Offset =  86.15661
+Phase Difference:  39.5126
+Magnitude Difference:  5010
+Theta:  13.94951
+Signal Located at 12 o'Clock
+
+Analog Voltage:  0.902559
+Phase Offset =  92.16985
+Phase Difference:  33.49935
+Magnitude Difference:  3473
+Theta:  11.7932
+Signal Located at 12 o'Clock
+
+Analog Voltage:  1.143507
+Phase Offset =  69.40609
+Phase Difference:  56.26312
+Magnitude Difference:  4802
+Theta:  20.07573
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.758389
+Phase Offset =  11.31448
+Phase Difference:  114.3547
+Magnitude Difference:  11283
+Theta:  44.24111
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.526303
+Phase Offset =  33.24097
+Phase Difference:  92.42824
+Magnitude Difference:  7906
+Theta:  34.32632
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.159620
+Phase Offset =  67.88374
+Phase Difference:  57.78545
+Magnitude Difference:  8242
+Theta:  20.64334
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.743081
+Phase Offset =  12.76071
+Phase Difference:  112.9085
+Magnitude Difference:  7458
+Theta:  43.5396
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.203932
+Phase Offset =  63.69731
+Phase Difference:  61.97189
+Magnitude Difference:  8338
+Theta:  22.21549
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.342559
+Phase Offset =  50.60042
+Phase Difference:  75.06878
+Magnitude Difference:  6626
+Theta:  27.25783
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.818009
+Phase Offset =  5.681824
+Phase Difference:  119.9874
+Magnitude Difference:  7394
+Theta:  47.05804
+Signal Located at 10 o'Clock
+
+Analog Voltage:  1.663319
+Phase Offset =  20.29631
+Phase Difference:  105.3729
+Magnitude Difference:  7058
+Theta:  40.00699
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.731801
+Phase Offset =  13.82635
+Phase Difference:  111.8428
+Magnitude Difference:  6098
+Theta:  43.02789
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.290190
+Phase Offset =  55.54802
+Phase Difference:  70.12118
+Magnitude Difference:  4498
+Theta:  25.32866
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.693934
+Phase Offset =  17.40385
+Phase Difference:  108.2653
+Magnitude Difference:  7138
+Theta:  41.34015
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.820426
+Phase Offset =  5.453476
+Phase Difference:  120.2157
+Magnitude Difference:  8386
+Theta:  47.17534
+Signal Located at 10 o'Clock
+
+Analog Voltage:  1.548862
+Phase Offset =  31.10968
+Phase Difference:  94.55952
+Magnitude Difference:  10259
+Theta:  35.2334
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.727773
+Phase Offset =  14.20692
+Phase Difference:  111.4623
+Magnitude Difference:  7634
+Theta:  42.84618
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.608482
+Phase Offset =  25.47702
+Phase Difference:  100.1922
+Magnitude Difference:  10947
+Theta:  37.68163
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.482797
+Phase Offset =  37.35129
+Phase Difference:  88.31791
+Magnitude Difference:  10563
+Theta:  32.60392
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.472323
+Phase Offset =  38.34081
+Phase Difference:  87.3284
+Magnitude Difference:  9395
+Theta:  32.19425
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.513413
+Phase Offset =  34.45883
+Phase Difference:  91.21037
+Magnitude Difference:  9251
+Theta:  33.81239
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.236965
+Phase Offset =  60.57651
+Phase Difference:  65.09269
+Magnitude Difference:  9891
+Theta:  23.39895
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.230520
+Phase Offset =  61.18544
+Phase Difference:  64.48376
+Magnitude Difference:  9171
+Theta:  23.16722
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.255546
+Phase Offset =  58.82105
+Phase Difference:  66.84814
+Magnitude Difference:  9043
+Theta:  24.06929
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.199904
+Phase Offset =  64.07789
+Phase Difference:  61.59131
+Magnitude Difference:  8546
+Theta:  22.07186
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.296635
+Phase Offset =  54.93908
+Phase Difference:  70.73012
+Magnitude Difference:  8466
+Theta:  25.56439
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.209572
+Phase Offset =  63.16448
+Phase Difference:  62.50472
+Magnitude Difference:  8899
+Theta:  22.41683
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.143507
+Phase Offset =  69.40609
+Phase Difference:  56.26312
+Magnitude Difference:  7666
+Theta:  20.07573
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.316777
+Phase Offset =  53.03617
+Phase Difference:  72.63303
+Magnitude Difference:  6754
+Theta:  26.30407
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.234548
+Phase Offset =  60.80485
+Phase Difference:  64.86435
+Magnitude Difference:  6066
+Theta:  23.31201
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.256352
+Phase Offset =  58.74494
+Phase Difference:  66.92426
+Magnitude Difference:  10019
+Theta:  24.09844
+Signal Located at 11 o'Clock
+
+Analog Voltage:  1.236965
+Phase Offset =  60.57651
+Phase Difference:  65.09269
+Magnitude Difference:  9571
+Theta:  23.39895
+Signal Located at 11 o'Clock
+
+Analog Voltage:  0.980709
+Phase Offset =  84.78649
+Phase Difference:  40.88271
+Magnitude Difference:  6162
+Theta:  14.44353
+Signal Located at 12 o'Clock
+
+Analog Voltage:  1.015354
+Phase Offset =  81.51346
+Phase Difference:  44.15574
+Magnitude Difference:  6434
+Theta:  15.62825
+Signal Located at 11 o'Clock
+
+Analog Voltage:  0.847773
+Phase Offset =  97.34581
+Phase Difference:  28.32339
+Magnitude Difference:  2801
+Theta:  9.95073
+Signal Located at 12 o'Clock
+Traceback (most recent call last):
+  File "main.py", line 95, in <module>
+KeyboardInterrupt:
+MicroPython v1.18 on 2022-01-17; Raspberry Pi Pico with RP2040
+Type "help()" for more information.

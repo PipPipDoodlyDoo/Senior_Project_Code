@@ -4,9 +4,10 @@ import math
 SP_LIB = {
     "REF_VOLT"  : 3.3,                          # Reference Voltage for ADC
     "BIT_RES"   : 65535,                        # Bit Resolution for ADC
-    "DIST"      : 0.076,                        # distance between antennas [meters] (76 cm)
+    "DIST"      : 1.65,                         # distance between antennas [meters] (76 cm)
     "BETA"      : 3.466,                        # Beta for 165.5 MHz
     "LAMBDA"    : 1.826,                        # wavelength for 165.5 MHz
+    "NUM_ELEM"  : 2,                            # Number of Elements
     "3 o'clock" : 0,                            # direction headings
     "2 o'clock" : 1,
     "1 o'clock" : 2,
@@ -37,8 +38,9 @@ def volt_2_ph(voltage, half):
 
 # CALCULATE ANGEL OF PLANE'S TRAVELING DIRECTION TO BEACON SIGNAL POSITION
 def Phase_array_calc(phase):
-    theta = math.asin(math.radians((phase * SP_LIB["LAMBDA"]) / (360 * SP_LIB["DIST"])))
-    theta = math.degrees(theta) * 2
+    theta = (phase * SP_LIB["NUM_ELEM"] * SP_LIB["LAMBDA"])/(360 * SP_LIB["DIST"])  # General Equation for Phase Array
+    theta = math.asin(math.radians(theta))                                          # Inverse Sine in radians
+    theta = math.degrees(theta)                                                     # Convert to Degrees
     return theta
 
 # USE THE INFORMATION TO SHOW USER WHERE BACON (lol) SIGNAL IS

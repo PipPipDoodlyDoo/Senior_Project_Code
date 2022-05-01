@@ -30,18 +30,6 @@ def dig_2_ana(dig_value):
     print("\nAnalog Voltage: ", '{:2f}'.format(analog_value))         # print out the analog voltage
     return analog_value
 
-# CONVERT ANALOG VOLTAGE TO PHASE ACCORDING TO AD8302 (really can use either or)
-def volt_2_ph(voltage, half):
-    if half == 1:
-        phase = abs(-94.786 * voltage + 177.15)
-        print('Phase Offset = ', phase)
-        return phase
-    elif half == 0:
-        phase = abs(94.476 * voltage - 177.44)
-        phase = abs(phase)
-        print('Phase Offset = ', phase)
-        return phase
-
 # CALCULATE ANGEL OF PLANE'S TRAVELING DIRECTION TO BEACON SIGNAL POSITION
 def Phase_array_calc(phase):
     phase = math.radians(phase)

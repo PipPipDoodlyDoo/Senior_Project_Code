@@ -249,8 +249,10 @@ Notes to do:
 ___________________________________________________________________________
 Version 3 Changes:
 - ph_mes and mag_mes are now list to store consecutive readings. [3 is the limit so far]
+- moved the ph_voltage-to-phase to the phase offset source file
 -[] Maybe use a separate interrupt button to change which slope is being used
-
+-[] incoperate a reinialization pin
 Note:
     -Before sending it to change the voltage to the phase, check if it wrapped by checking max or min
     -check if the phase has not hit the lowest if so check the magnitude if it has came back
+    -

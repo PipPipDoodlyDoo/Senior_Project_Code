@@ -24,13 +24,14 @@ def inter_pin(in_pin):  # Need variable that causes interrupt
     cal_prog = 1  # Set flag high for the calibration stage to be done
 
 
-# INIT VARIABLES
-cal_prog    = 0  # use to jump out of calibration process
-ph_cal      = 0  # Calibrated Phase Recording
-ph_mes      = []  # Measured Phase Recording
-mag_cal     = 0  # Calibrated Magnitude Recording
-mag_mes     = []  # Measured Magnitude Recording
-slope_dir   = 1
+
+# INITIALIZING VARIABLES
+cal_prog    = 0             # use to jump out of calibration process
+ph_cal      = 0             # Calibrated Phase Recording
+ph_mes      = []            # Measured Phase Recording
+mag_cal     = 0             # Calibrated Magnitude Recording
+mag_mes     = []            # Measured Magnitude Recording
+slope_dir   = 1             # determining which slope is being used for the calulc
 
 
 # INIT ON-BOARD LED FOR DEBUGGING
@@ -60,8 +61,7 @@ while cal_prog == 0:  # Keep capturing the zero value until user stops with butt
     ph_cal = Ph_adc_pin.read_u16()
     mag_cal = Mag_adc_pin.read_u16()
 
-    ph_cal = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_cal),
-                                      1)  # Convert the Digital voltage to Analog and into Phase offset [Degrees]
+    ph_cal = Phase_Offset.volt_2_ph(Senior_Project.dig_2_ana(ph_cal), slope_dir)  # Convert the Digital voltage to Analog and into Phase offset [Degrees]
 
     # DISPLAY MEASUREMENT TO THE USER
     print('Initial Phase Offset: ', '{:2f}'.format(ph_cal))

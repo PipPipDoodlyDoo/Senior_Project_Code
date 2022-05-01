@@ -38,7 +38,7 @@ out_pin.high()                                                              # Pu
 
 # INIT INPUT GPIO PIN
 in_pin = Pin(PA_main["IN_PIN"], Pin.IN, Pin.PULL_DOWN)                                      # Set the initial value to zero
-in_pin.irq(trigger=Pin.IRQ_RISING, handler= inter_pin)                      # Set_up input pin as an interupt and run "inter_pin" function
+in_pin.irq(trigger=Pin.IRQ_RISING, handler= inter_pin)                      # Set_up input pin as an interrupt and run "inter_pin" function
 
 # INIT ADC PINS
 Ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))                                  # Init Phase ADC Pin
@@ -48,10 +48,10 @@ Mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))                                 # In
 print("Initialization is complete!")
 
 # CALIBRATION PROCESS
-print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'click position.")
+print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'clock position.")
 
 # CAPTURE ZERO VALUES OF PHASE AND MAGNITUDE OUTPUT OF AD8302
-while (cal_prog == 0):                                                        # Keep capturing the zero value until user stops with button press
+while cal_prog == 0:                                                        # Keep capturing the zero value until user stops with button press
     ph_cal  = Ph_adc_pin.read_u16()
     mag_cal = Mag_adc_pin.read_u16()
 

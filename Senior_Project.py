@@ -1,6 +1,11 @@
 # Modular Code for Version 3
 import math
 
+#####################################################
+# This source file is used to store defined functions
+#  that is used within the main source code
+#####################################################
+
 # Dictionary for the source file.
 SP_LIB = {
     "REF_VOLT"  : 3.3,                          # Reference Voltage for ADC

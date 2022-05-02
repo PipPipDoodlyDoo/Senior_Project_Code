@@ -23,6 +23,7 @@ def inter_pin(in_pin):  # Need variable that causes interrupt
     global cal_prog  # Make sure that we can write to the flag and recognise it
     cal_prog = 1  # Set flag high for the calibration stage to be done
 
+#
 
 
 # INITIALIZING VARIABLES
@@ -31,7 +32,9 @@ ph_cal      = 0             # Calibrated Phase Recording
 ph_mes      = []            # Measured Phase Recording
 mag_cal     = 0             # Calibrated Magnitude Recording
 mag_mes     = []            # Measured Magnitude Recording
-slope_dir   = 1             # determining which slope is being used for the calulc
+slope_dir   = 1             # determining which slope is being used for the calculation
+ph_out_max  = 1.8           # Data Sheet Maximum Phase Voltage Output for AD8302
+ph_out_min  = 0.3           # Data Sheet Minimum Phase Voltage Output for AD8302
 
 
 # INIT ON-BOARD LED FOR DEBUGGING
@@ -74,14 +77,16 @@ while cal_prog == 0:  # Keep capturing the zero value until user stops with butt
 ####################################################################
 
 
-
-for i in range(3):
+# CAPTURE 2 ADC MEASUREMENT
+for i in range(2):
     ph_mes.append(Ph_adc_pin.read_u16())                                # Capture reading and put it in the list
     mag_mes.append(Mag_adc_pin.read_u16())                              # Do the same for magnitude pin
+    # note for later: keep phase offset as voltage and not convert. Make sure the voltage is not the max or min
+
 
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
 while True:
-    # CAPTURE 3 ADC MEASUREMENTS
+
 
 
     # CAPTURE THE MEASUREMENT

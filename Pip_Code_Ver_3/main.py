@@ -44,6 +44,17 @@ def slope_change_interrupt(sl_ch_in_pin):
         slope_dir = 1
 
 
+# CHECK IF THE MEASURED PHASE IS NEW MAX OR MIN
+def phase_max_min_check(phase_mes):
+    global ph_out_max
+    global ph_out_min
+
+    if ph_out_max < phase_mes:
+        ph_out_max = phase_mes
+
+    elif ph_out_min > phase_mes:
+
+
 # INITIALIZING VARIABLES
 cal_prog = 0                            # use to jump out of calibration process
 ph_cal = 0                              # Calibrated Phase Recording
@@ -124,6 +135,9 @@ for i in range(3):
 
 # CHECK IF THOSE MEASUREMENTS ARE THE MAX OR MIN
 for i in ph_mes:                                    # This should index through
+    if ph_mes[i] >= ph_out_max:                     # Check for new max
+        ph_out_max = ph_mes[i]
+
 
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
 while True:

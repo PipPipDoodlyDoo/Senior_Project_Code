@@ -136,8 +136,7 @@ for i in range(3):
 
 # CHECK IF THOSE MEASUREMENTS ARE THE MAX OR MIN
 for i in ph_mes:                                    # This should index through
-    if ph_mes[i] >= ph_out_max:                     # Check for new max
-        ph_out_max = ph_mes[i]
+    phase_max_min_check(ph_mes[i])                  # Test all the measurements if the phase max or min is exceeded
 
 
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER

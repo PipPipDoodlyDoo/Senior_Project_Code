@@ -53,6 +53,7 @@ def phase_max_min_check(phase_mes):
         ph_out_max = phase_mes
 
     elif ph_out_min > phase_mes:
+        ph_out_min = phase_mes
 
 
 # INITIALIZING VARIABLES

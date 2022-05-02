@@ -247,16 +247,60 @@ Notes to do:
     -[] Need to worry about if i hit the maximum output of phase pin which is in-phase input.
 
 ___________________________________________________________________________
+For the Evaluation board, The top pins from left to right are:
+    1: Ground
+    2: Vpp
+    3: Ground
+
+There are also rings that are Ground and Vpp
+
+TYPICAL RATING:
+    Power Supply: 5V
+    Input Voltage: -73      to -13 dBm
+                    140 uV  to  140 mV
+Test 1:
+	This test was conducted within the SPL using:
+		RIGOL DG1022	Function Generator
+		RIGOL DP832		Programmable DC Power Supply
+		RIGOL DM3058E 	Digital Multimeter
+		RG316 Wires (1 meter)
+		BNC-to-SMA Adapters
+		AD8302
+
+	Function Generator Parameters:
+		For both OUTPUTS
+			Freq:			20 MHz
+			Ampl:			14 mVpp -> -33 dBm
+			Offset:			N/A
+		Phase (Output 1):	0 degree
+		Phase (Output 2):	varied from 0-to-360 degrees
+
+    Equations:
+        Converting the Votlage to phase offset [Volts-to-Degree]
+        y = 94.476x - 177.44
+        y = -94.786x + 177.15
+
+___________________________________________________________________________
 Version 3 Changes:
 - ph_mes and mag_mes are now list to store consecutive readings. [3 is the limit so far]
 - moved the ph_voltage-to-phase to the phase offset source file
 - from the 2 initial measured
 - use the data sheet max min output as the initial max and min. check always if thsi change
     -STANDARD DEV OF MAX AND MIN = 5m
+
+THINGS TO DO
 -[] Compare the analog voltages instead of phase offset after measurements
 -[] Maybe use a separate interrupt button to change which slope is being used. The other following calculation will follow
 -[] incorporate a initialization pin
-Note:
+
+NOTES:
     -PHASE MAX: 1.8V    MIN: 0.03V  [use as initial voltage check mark]
     -Before sending it to change the voltage to the phase, check if it wrapped by checking max or min
     -check if the phase has not hit the lowest if so check the magnitude if it has came back
+    -pins that together:
+        FOR CURRENT BOARD:
+        Out -> In
+        20  -> 18
+        15  -> 14
+        11  -> 10
+

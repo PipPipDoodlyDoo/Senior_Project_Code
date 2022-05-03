@@ -292,6 +292,9 @@ THINGS TO DO
 -[] Compare the analog voltages instead of phase offset after measurements
 -[] Maybe use a separate interrupt button to change which slope is being used. The other following calculation will follow
 -[] incorporate a initialization pin
+-[] _for the rising slope (or both):    + moving right would be using Rise, add -180 everytime reset
+                                        + moving left dont add anything, just mark that reset adding to phase offset
+
 
 NOTES:
     -PHASE MAX: 1.8V    MIN: 0.03V  [use as initial voltage check mark]

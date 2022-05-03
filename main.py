@@ -16,7 +16,11 @@ PA_main = {
     "SL_CH_IN_PIN"  : 15,
     "DEBOUNCE_SL"   : 1,                # Debounce sleeping time
     "FIRST_INDEX"   : 0,                # Don't know if we need this
-    "PHASE_DEV"     : 0.05              # Phase Voltage Deviation/Buffer
+    "PHASE_DEV"     : 0.05,             # Phase Voltage Deviation/Buffer
+    "HIGH_DEV"      : 0,                #
+    "LOW_DEV"       : 1,                 # Indicate that we are in lower deviation
+    "RISING_SLOPE"  : 0,
+    "FALLING_SLOPE" : 1
 }
 
 
@@ -46,10 +50,10 @@ def slope_change_interrupt(sl_ch_in_pin):
     global slope_dir
     if slope_dir == 1:
         LED.low()
-        slope_dir = 0
+        slope_dir = 1
     else:
         LED.high()
-        slope_dir = 1
+        slope_dir = 0
 
 #################################################################################
 # Phase Offset Calculation
@@ -57,13 +61,14 @@ def slope_change_interrupt(sl_ch_in_pin):
 
 # CONVERT ANALOG VOLTAGE TO PHASE ACCORDING TO AD8302 (really can use either or)
 def volt_2_ph(voltage):
+    # FALLING SLOPE
     if slope_dir == 1:
-        phase = abs(-94.786 * voltage + 177.15)
+        phase = -94.786 * voltage + 177.15
         print('Phase Offset = ', phase)
         return phase
+    # RISING SLOPE
     elif slope_dir == 0:
-        phase = abs(94.476 * voltage - 177.44)
-        phase = abs(phase)
+        phase = 94.476 * voltage - 177.44
         print('Phase Offset = ', phase)
         return phase
 
@@ -83,25 +88,33 @@ def phase_max_min_check():
 def phase_voltage_close_2_max_min():
     global repeat                                   #
     global ph_mes                                   # Need to use this local variable constantly
+    global index
+    # THESE CALCULATION IS FOR SLOPE DIRECTION 1. INPA: LEFT ANTENNA,   INPB: RIGHT ANTENNA
     # ABOVE THE MAX DEVIATION
     while True:
+        # CHECK PHASE VOLTAGE IN UPPER DEVIATION
         if ph_mes < (ph_out_max - PA_main["PHASE_DEV"]):
-            break
+            break                                   # Get out if measurement is not in Upper Devation
         flag = 1                                    # Signal that voltage is in deviation zone
-        marker = 0                                  # Indicate which region
+        marker = PA_main["LOW_DEV"]                 # Indicate on Max Deviation Region
         ph_mes = ph_adc_pin.read_u16()              # Change the Phase Voltage value
         mag_dev_mes = mag_adc_pin.read_u16()        # Use this variable to check if we moved on
 
     # BELOW THE MIN DEVIATION
     while True:
-        if ph_mes < (ph_out_min + PA_main["PHASE_DEV"]):
+        # CHECK IF THE PHASE VOLTAGE IS IN THE LOWER DEVIATION
+        if ph_mes > (ph_out_min + PA_main["PHASE_DEV"]):
             break
-        marker = 1
+        flag = 1                                    # Signal that Village is in Deviation Zone
+        marker = PA_main["HIGH_DEV"]
         ph_mes = ph_adc_pin.read_u16()
-        mag_dev_mes = mag_adc_pin.read_u16()  # Use this variable to check if we moved on
+        mag_dev_mes = mag_adc_pin.read_u16()        # Use this variable to check if we moved on
 
-    ####### HAVE TO WORRY ABOUT THE SLOPE DIRECTION AS WELL
-    if (marker == 0) and:
+    # TEST CASE FOR RISING SLOPE, UPPER DIV AND IN DEVIATION
+    if (marker == 0) and (flag == 1) and (slope_dir == 0):
+        if mag_dev_mes > mag_mes:                   # This means that we move onto
+            return PA_main["FALLING_SLOPE"]         # Configure the slope direction
+
 
 
 
@@ -111,14 +124,14 @@ def phase_voltage_close_2_max_min():
 # VARIABLES
 cal_prog = 0                            # use to jump out of calibration process
 ph_cal = 0                              # Calibrated Phase Recording
-ph_mes = 0                              # Measured Phase Recording
+ph_mes = []                             # Measured Phase Recording
 mag_cal = 0                             # Calibrated Magnitude Recording
 mag_mes = 0                             # Measured Magnitude Recording
 slope_dir = 1                           # determining which slope is being used for the calculation
 repeat = 0                              # what iteration on repeat
 ph_out_max = 1.8                        # Data Sheet Maximum Phase Voltage Output for AD8302
 ph_out_min = 0.3                        # Data Sheet Minimum Phase Voltage Output for AD8302
-
+index = 0
 
 # ON-BOARD LED FOR DEBUGGING
 LED = Pin(25, Pin.OUT)                              # Set the LED to output
@@ -189,7 +202,7 @@ LED.high()                                          # Set value high
 while True:
     # CAPTURE THE MEASUREMENT
     ph_mes = ph_adc_pin.read_u16()
-    mag_mes.append(mag_adc_pin.read_u16())                  # append adds the newest measurement which is the 4th index
+    mag_mes =mag_adc_pin.read_u16()                  # append adds the newest measurement which is the 4th index
 
     # CALCULATE MAGNITUDE DIFFERENCE FROM CALIBRATION
     mag_dif = mag_mes - mag_cal
@@ -198,13 +211,6 @@ while True:
     # CHECK IF WE ARE AT THE MAX OR MIN DEVIATION
     phase_voltage_close_2_max_min()
 
-
-
-
-
-
-    # POP THE FIRST INDEX WHICH IS THE OLDEST DATA
-    mag_mes.pop(PA_main["FIRST_INDEX"])
 
 
 

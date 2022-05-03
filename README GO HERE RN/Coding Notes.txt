@@ -276,7 +276,7 @@ Test 1:
 		Phase (Output 2):	varied from 0-to-360 degrees
 
     Equations:
-        Converting the Votlage to phase offset [Volts-to-Degree]
+        Converting the Voltage to phase offset [Volts-to-Degree]
         y = 94.476x - 177.44
         y = -94.786x + 177.15
 
@@ -286,7 +286,10 @@ Version 3 Changes:
 - moved the ph_voltage-to-phase to the phase offset source file
 - from the 2 initial measured
 - use the data sheet max min output as the initial max and min. check always if thsi change
-    -STANDARD DEV OF MAX AND MIN = 5m
+    -STANDARD DEV OF MAX AND MIN = 5 mV
+- Check if we hit max or min using Modular?
+    - passing in the adc pins, max & min voltages, and current phase voltage
+- Phase offset measurement needs to take account of the ROLLOVER
 
 THINGS TO DO
 -[] Compare the analog voltages instead of phase offset after measurements
@@ -306,4 +309,31 @@ NOTES:
         20  -> 18
         15  -> 14
         11  -> 10
+    - to check for the max and min dev use the mag_mes array. use another index after to check
+    - IF PHASE OFFSET CALCULATION TAKES TOO LONG JUST DO ONE ITTERATION FOR 1 CASE THEN 2 LATER.
+        - IF NEEDED FOR MORE PHASE OFFSET, THEN USE THE REPEAT TO ADVANTAGE
+        - ONLINE IDE THAT SUCCESSFULLY RAN EVERYTHING
+def func():
+    x = 0
+    global y
+    while True:
+        if x > 10:
+            break
+        x += 1
+        marker = 1
 
+    if marker == 1:
+        print('hi')
+        y = 1
+
+y = 0
+
+func()
+print('done')
+if y == 1:
+    print('yes')
+
+OUTPUT:
+    hi
+    done
+    yes

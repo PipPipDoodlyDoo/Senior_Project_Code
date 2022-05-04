@@ -20,7 +20,8 @@ PA_main = {
     "HIGH_DEV"      : 0,                #
     "LOW_DEV"       : 1,                 # Indicate that we are in lower deviation
     "RISING_SLOPE"  : 0,
-    "FALLING_SLOPE" : 1
+    "FALLING_SLOPE" : 1,
+    "ERROR"         : 10                # some random value to distinguish error
 }
 
 
@@ -31,7 +32,7 @@ PA_main = {
 # INTERRUPT PROTOCOL TO CHANGE VALUE OF "cal_prog" FLAG TO EXIT CALIBRATION
 def inter_pin(cal_in_pin):              # Need variable that causes interrupt
     # DEBOUNCE
-    while cal_in_pin.value() == True:   # Wait for debounce sleep
+    while cal_in_pin.value():   # Wait for debounce sleep
         utime.sleep_us(1)               # Act as NOP
     utime.sleep(PA_main["DEBOUNCE_SL"]) # debounce sleep time
 
@@ -43,7 +44,7 @@ def inter_pin(cal_in_pin):              # Need variable that causes interrupt
 # CHANGING THE SLOPE
 def slope_change_interrupt(sl_ch_in_pin):
     # DEBOUNCE
-    while sl_ch_in_pin.value() == True: # wait for user to take hand off button
+    while sl_ch_in_pin.value():         # wait for user to take hand off button
         utime.sleep_us(1)               # NOP
     utime.sleep(PA_main["DEBOUNCE_SL"]) # Debounce sleep time
 
@@ -75,8 +76,7 @@ def volt_2_ph(voltage):
 
 # CHECK IF THE MEASURED PHASE IS NEW MAX OR MIN
 def phase_max_min_check():
-    global ph_out_max
-    global ph_out_min
+    global ph_out_max, ph_out_min
 
     if ph_out_max < ph_mes:
         ph_out_max = ph_mes
@@ -86,17 +86,19 @@ def phase_max_min_check():
 
 # CHECK IF PHASE VOLTAGE IS MAX OR MIN
 def phase_voltage_close_2_max_min():
-    global repeat                                   #
-    global ph_mes                                   # Need to use this local variable constantly
-    global index
+    global repeat, ph_mes, index
+    marker = PA_main["ERROR"]                           # Set the initial variables used to error protocol
+    flag = PA_main["ERROR"]
+    mag_dev_mes = PA_main["ERROR"]
+
     # THESE CALCULATION IS FOR SLOPE DIRECTION 1. INPA: LEFT ANTENNA,   INPB: RIGHT ANTENNA
     # ABOVE THE MAX DEVIATION
     while True:
         # CHECK PHASE VOLTAGE IN UPPER DEVIATION
         if ph_mes < (ph_out_max - PA_main["PHASE_DEV"]):
-            break                                   # Get out if measurement is not in Upper Devation
+            break                                   # Get out if measurement is not in Upper Deviation
         flag = 1                                    # Signal that voltage is in deviation zone
-        marker = PA_main["LOW_DEV"]                 # Indicate on Max Deviation Region
+        marker = PA_main["HIGH_DEV"]                 # Indicate on Max Deviation Region
         ph_mes = ph_adc_pin.read_u16()              # Change the Phase Voltage value
         mag_dev_mes = mag_adc_pin.read_u16()        # Use this variable to check if we moved on
 
@@ -106,16 +108,33 @@ def phase_voltage_close_2_max_min():
         if ph_mes > (ph_out_min + PA_main["PHASE_DEV"]):
             break
         flag = 1                                    # Signal that Village is in Deviation Zone
-        marker = PA_main["HIGH_DEV"]
+        marker = PA_main["LOW_DEV"]
         ph_mes = ph_adc_pin.read_u16()
         mag_dev_mes = mag_adc_pin.read_u16()        # Use this variable to check if we moved on
 
     # TEST CASE FOR RISING SLOPE, UPPER DIV AND IN DEVIATION
-    if (marker == 0) and (flag == 1) and (slope_dir == 0):
+    if (marker == PA_main["HIGH_DEV"]) and (flag == 1) and (slope_dir == 0):
         if mag_dev_mes > mag_mes:                   # This means that we move onto
+            index = 1                               # move the index
+            repeat = 1
             return PA_main["FALLING_SLOPE"]         # Configure the slope direction
+    # TEST CASE FOR RISING SLOPE, LOWER DIV AND IN DEVIATION
+    if (marker == PA_main["LOW_DEV"]) and (flag == 1) and (slope_dir == 0):
+        if mag_dev_mes < mag_mes:                   # signal moving left
+            index = 1                               # move the index
+            repeat = -1
+            return PA_main["RISING_SLOPE"]         # Configure the slope direction
 
 
+def phase_offset_calculation():
+    if repeat == 1:
+        phase_off = abs(ph_mes[0] + ph_mes[1] - ph_cal)
+    elif repeat == -1:
+        phase_off = abs(ph_mes[0] + 180 - ph_mes[1] - ph_cal)
+    else:
+        phase_off = abs(ph_cal - ph_mes[0])
+
+    return phase_off
 
 
 #################################################################################
@@ -124,7 +143,7 @@ def phase_voltage_close_2_max_min():
 # VARIABLES
 cal_prog = 0                            # use to jump out of calibration process
 ph_cal = 0                              # Calibrated Phase Recording
-ph_mes = []                             # Measured Phase Recording
+ph_mes = [0, 0]                         # Measured Phase Recording
 mag_cal = 0                             # Calibrated Magnitude Recording
 mag_mes = 0                             # Measured Magnitude Recording
 slope_dir = 1                           # determining which slope is being used for the calculation
@@ -201,22 +220,33 @@ LED.high()                                          # Set value high
 ####################################################################
 while True:
     # CAPTURE THE MEASUREMENT
-    ph_mes = ph_adc_pin.read_u16()
-    mag_mes =mag_adc_pin.read_u16()                  # append adds the newest measurement which is the 4th index
+    ph_mes[index] = ph_adc_pin.read_u16()
+    mag_mes = mag_adc_pin.read_u16()                  # append adds the newest measurement which is the 4th index
 
     # CALCULATE MAGNITUDE DIFFERENCE FROM CALIBRATION
     mag_dif = mag_mes - mag_cal
 
+    # CONVERT PHASE MEASUREMENT TO ANALOG
+    ph_mes[index] = Senior_Project.dig_2_ana(ph_mes[index])
 
     # CHECK IF WE ARE AT THE MAX OR MIN DEVIATION
     phase_voltage_close_2_max_min()
 
+    # CALCULATE PHASE OFFSET
+    phase_offset = phase_offset_calculation()
+
+    # CALCULATE PHASE ARRAY
+    theta = Senior_Project.Phase_array_calc(phase_offset)
+    print('Theta: ', theta)
+
+
+    # Display direction to user
+    heading = Senior_Project.dir_to_heading(theta, mag_dif)
+    Senior_Project.dis_head(heading)
 
 
 
-    while True:
-        print('done')
-        utime.sleep(2)
+
 
 
     ################################################################

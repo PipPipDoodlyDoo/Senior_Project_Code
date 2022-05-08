@@ -1,7 +1,12 @@
-# Source Code for ALT_CODE
+# Modular Code for Version 3
 import math
 
-# DICTIONARY FOR SOURCE FILE
+#####################################################
+# This source file is used to store defined functions
+#  that is used within the main source code
+#####################################################
+
+# Dictionary for the source file.
 SP_LIB = {
     "REF_VOLT"  : 3.3,                          # Reference Voltage for ADC
     "BIT_RES"   : 65535,                        # Bit Resolution for ADC
@@ -16,30 +21,16 @@ SP_LIB = {
     "11 o'clock": 4,
     "10 o'clock": 5,
     "9 o'clock" : 6,
-    "ERROR"     : 7,
-    "RISING_SLOPE": 1,
-    "FALLING SLOPE": 0
+    "ERROR"     : 7
 }
 
-# DIGITAL TO ANALOG CONVERTOR
+# THIS FUNCTION WILL CONVERT THE DIGITAL VALUE TO ANALOG
 def dig_2_ana(dig_value):
     analog_value = SP_LIB["REF_VOLT"] / SP_LIB["BIT_RES"] * dig_value
     print("\nAnalog Voltage: ", '{:2f}'.format(analog_value))         # print out the analog voltage
     return analog_value
 
-# ANALOG TO PHASE OFFSET CONVERTOR
-def volt_2_ph(voltage, half):
-    if half == SP_LIB["RISING_SLOPE"]:
-        phase = abs(-94.786 * voltage + 177.15)
-        print('Phase Offset = ', phase)
-        return phase
-    elif half == SP_LIB["FALLING SLOPE"]:
-        phase = abs(94.476 * voltage - 177.44)
-        phase = abs(phase)
-        print('Phase Offset = ', phase)
-        return phase
-
-# PHASE ARRAY CALCULATION: (Relative to drone's flying direction)
+# CALCULATE ANGEL OF PLANE'S TRAVELING DIRECTION TO BEACON SIGNAL POSITION
 def Phase_array_calc(phase):
     phase = math.radians(phase)
     theta = (phase * SP_LIB["NUM_ELEM"] * SP_LIB["LAMBDA"])/(2 * math.pi * SP_LIB["DIST"])  # General Equation for Phase Array

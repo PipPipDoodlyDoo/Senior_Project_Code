@@ -86,7 +86,7 @@ ___________________________________________________________________________
 Threading
 
 Description: 
-	This is running multiple instructions of code simultaneously. Within the circuitdigest documentation of
+	This is running multiple instructions of code simultaneously. Within the circuit digest documentation of
 	"multicore" processing, it says that there is one thread per core for the RP2040.
 	
 	(https://circuitdigest.com/microcontroller-projects/dual-core-programming-on-raspberry-pi-pico-using-micropython)
@@ -154,7 +154,7 @@ Code:
     thisdict["brand"]
 ___________________________________________________________________________
 Lists
-    This can be utilize with organizing the old data and comapring it to the new
+    This can be utilized with organizing the old data and comparing it to the new
     Mostly during the calibration stage we will check if the 2 values are increasing or decreasing
     This will tell us what end of the slope we are on.
 
@@ -186,7 +186,8 @@ Notes:
         -Pin.IRQ_RISING
         -Pin.IRQ_LOW_LEVEL
         -Pin.IRQ_HIGH_LEVEL
-        (These values can be OR'ed together to have multiple triggers.
+        (These values can be OR'ed together to have multiple triggers)
+
 ___________________________________________________________________________
 
 AD8302 Notes:
@@ -203,7 +204,7 @@ Code Notes:
 ___________________________________________________________________________
 Testing Notes:
     - As for the ADC, when converting the digital to analog value for the voltage, Channel 0 (pin 26) is 20 mV higher. May need to take that
-        to consideration depending on the sensativity when it comes to the direction to heading.
+        to consideration depending on the sensitivity when it comes to the direction to heading.
 
 ___________________________________________________________________________
 Implementation Notes
@@ -221,8 +222,8 @@ Phase Array:
     Now the equation to get Beam Direction from Phase shift is:
         theta = asin((phi * lambda) / (360 * d))
 Theory:
-    If my thinking is right then the beam directoin (theta) should come from straight on.
-    Therefore the 12 o'clock direction should be 0 degree which means that this is
+    If my thinking is right then the beam direction (theta) should come from straight on.
+    Therefore, the 12 o'clock direction should be 0 degree which means that this is
 Hardware:
     As we sample the output AD8302 in Volts, we go from Digital Volts -> Analog Voltage -> Degrees
     As for the heading:
@@ -236,15 +237,15 @@ Hardware:
 
 ___________________________________________________________________________
 Notes to do:
-    -[] Later whether we use a LCD or a UART Terminal, all the print would change to
+    -[] Later whether we use an LCD or a UART Terminal, all the print would change to
         Serial writes. "writing to the user"
-    -[] During the Calibration values we have initial zero and we can find the degree offset from 2 successive elements and
+    -[] During the Calibration values we have initial zero, and we can find the degree offset from 2 successive elements and
         then with the Magnitude output ratio we can find
     -[] We will compare the difference of phase offset between the measured and calibrated value.
     -[] May have to incorporate another ADC for the reference Output of AD8302
-    -[] With finding whether the direction is left or right with using magnitude difference. If postive then INPA is higher than INPB
-        In a scenario, left antenna is INPA then this would mean the collar is in the left hand plane.
-    -[] Need to worry about if i hit the maximum output of phase pin which is in-phase input.
+    -[] With finding whether the direction is left or right with using magnitude difference. If positive then INPA is higher than INPB
+        In a scenario, left antenna is INPA then this would mean the collar is in the left-hand plane.
+    -[] Need to worry about if I hit the maximum output of phase pin which is in-phase input.
 
 ___________________________________________________________________________
 For the Evaluation board, The top pins from left to right are:
@@ -285,7 +286,7 @@ Version 3 Changes:
 - ph_mes and mag_mes are now list to store consecutive readings. [3 is the limit so far]
 - moved the ph_voltage-to-phase to the phase offset source file
 - from the 2 initial measured
-- use the data sheet max min output as the initial max and min. check always if thsi change
+- use the data sheet max min output as the initial max and min. check always if this change
     -STANDARD DEV OF MAX AND MIN = 5 mV
 - Check if we hit max or min using Modular?
     - passing in the adc pins, max & min voltages, and current phase voltage
@@ -296,13 +297,13 @@ THINGS TO DO
 -[] Maybe use a separate interrupt button to change which slope is being used. The other following calculation will follow
 -[] incorporate a initialization pin
 -[] _for the rising slope (or both):    + moving right would be using Rise, add -180 everytime reset
-                                        + moving left dont add anything, just mark that reset adding to phase offset
+                                        + moving left don't add anything, just mark that reset adding to phase offset
 
 
 NOTES:
     -PHASE MAX: 1.8V    MIN: 0.03V  [use as initial voltage check mark]
     -Before sending it to change the voltage to the phase, check if it wrapped by checking max or min
-    -check if the phase has not hit the lowest if so check the magnitude if it has came back
+    -check if the phase has not hit the lowest if so check the magnitude if it has come back
     -pins that together:
         FOR CURRENT BOARD:
         Out -> In
@@ -310,7 +311,7 @@ NOTES:
         15  -> 14
         11  -> 10
     - to check for the max and min dev use the mag_mes array. use another index after to check
-    - IF PHASE OFFSET CALCULATION TAKES TOO LONG JUST DO ONE ITTERATION FOR 1 CASE THEN 2 LATER.
+    - IF PHASE OFFSET CALCULATION TAKES TOO LONG JUST DO ONE ITERATION FOR 1 CASE THEN 2 LATER.
         - IF NEEDED FOR MORE PHASE OFFSET, THEN USE THE REPEAT TO ADVANTAGE
         - ONLINE IDE THAT SUCCESSFULLY RAN EVERYTHING
 def func():
@@ -337,3 +338,24 @@ OUTPUT:
     hi
     done
     yes
+___________________________________________________________________________
+Flow for ALT_CODE
+ISSUES:
+    - Don't know if there is a lot of CONSTRUCTIVE/DECONSTRUCTIVE INTERFERENCE within Microwave Lab
+NEED TO DO:
+    -[] Test with the oscilloscope or DMM if the voltage stays constant at 1.6 - 1.7 and 0.2 - 0.1V
+        (Voltage markings: 15 degree -> 0.15V [UPPER]  165 Degree -> 1.65V [LOWER])
+            REFER the Voltage as INPUT B LEADS or LAGS INPUT A
+
+INTERRUPTS:
+    -[] "cal_interrupt"     : Set (cal_prog == 1) to pass through calibration stage
+    -[] "confirm_func"      : Set (confirm == 1) pass through magnitude capture
+
+FUNCTION:
+    -[] "average_calc"      : gather the magnitude array at threshold voltages and take average
+
+MAIN_CODE:
+    -[] "Calibration"       : Capture Analog value for the MAGNITUDE and PHASE when signal
+                                is placed in front (relative to flight path)
+        ""
+

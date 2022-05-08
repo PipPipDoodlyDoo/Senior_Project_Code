@@ -1,275 +1,202 @@
-# Main code for version 3
-# Overhead Main codes that the Raspberry Pi will run
-import Senior_Project  # Modulating the Code
-from machine import Pin  # Use for Calibration Human Interaction
-from machine import ADC  # Read Voltage from AD8302
-import utime  # Sleep time
+# Main Code for ALT_CODE. Similar to Version 3
+# This will only use one slope. REMEMBER THAT PHASE STEP IS 10 mV per 10 degree
+
+# SOURCE CODES INCLUDED
+import Senior_Project                                   # Modulating the Code
+from machine import Pin                                 # Use for Calibration Human Interaction
+from machine import ADC                                 # Read Voltage from AD8302
+import utime                                            # Sleep time
 
 # DICTIONARY "LIBRARY OF VARIABLES THAT WILL BE USED"
 PA_main = {
-    "ADC_Ch_0"      : 26,               # Phase Channel
-    "ADC_Ch_1"      : 27,               # Magnitude Channel
-#    "ADC_Ch_2"      : 28,
-    "CAL_IN_PIN"    : 18,               # GPIO Pins used to configure for CALIBRATION
-    "CAL_OUT_PIN"   : 20,
-    "SL_CH_OUT_PIN" : 14,               # SLOPE CHANGE gpio to change PHASE OFFSET CALCULATION
-    "SL_CH_IN_PIN"  : 15,
-    "DEBOUNCE_SL"   : 1,                # Debounce sleeping time
-    "FIRST_INDEX"   : 0,                # Don't know if we need this
-    "PHASE_DEV"     : 0.05,             # Phase Voltage Deviation/Buffer
-    "HIGH_DEV"      : 0,                #
-    "LOW_DEV"       : 1,                 # Indicate that we are in lower deviation
-    "RISING_SLOPE"  : 0,
-    "FALLING_SLOPE" : 1,
-    "ERROR"         : 10                # some random value to distinguish error
+    "ADC_Ch_0"          : 26,                           # Phase Channel
+    "ADC_Ch_1"          : 27,                           # Magnitude Channel
+    "ADC_Ch_2"          : 28,
+    "cal_in_pin"        : 18,                           # Calibration Pin
+    "cal_out_pin"       : 20,
+    "CONFIRM_OUT_PIN"   : 14,
+    "CONFIRM_IN_PIN"    : 15,                           # Confirm Pin used for calibration
+    # Reference Pin
+    "RISING_SLOPE"      : 1,
+    "FALLING SLOPE"     : 0,
+    "LOWER_DEF"         : 180,                          # Lower Overlap Default value
+    "UPPER_DEF"         : 0,                            # Upper Overlap Default value
+    "CENTER"            : 0,                            # No overlap
+    "UPPER"             : 1,                            # Overlap on the phase lead
+    "LOWER"             : -1,                           # Overlap on Phase Lag sides
+    "DEBOUNCE_SL"       : 1,                           # Debounce sleeping time
+    "MAG_SAMPLES"       :15
 }
 
+# INTERRUPT FOR CALIBRATION DONE BUTTON
+def cal_interrupt(cal_in_pin):                              # Need variable that causes interrupt
+    cal_out_pin.low()                                   # Turn off the Pin
 
-############################################################################################
-# Interrupts
-############################################################################################
-
-# INTERRUPT PROTOCOL TO CHANGE VALUE OF "cal_prog" FLAG TO EXIT CALIBRATION
-def inter_pin(cal_in_pin):              # Need variable that causes interrupt
     # DEBOUNCE
-    while cal_in_pin.value():   # Wait for debounce sleep
-        utime.sleep_us(1)               # Act as NOP
-    utime.sleep(PA_main["DEBOUNCE_SL"]) # debounce sleep time
+    while cal_in_pin.value():                           # Wait for debounce sleep
+        utime.sleep_us(1)                               # Act as NOP
+    utime.sleep(PA_main["DEBOUNCE_SL"])                 # debounce sleep time
 
-    print('From Calibration interrupt')
-    global cal_prog                     # Make sure that we can write to the flag and recognise it
-    cal_prog = 1                        # Set flag high for the calibration stage to be done
+    global cal_prog                                     # Make sure that we can write to the flag and recognise it
+    cal_prog = 1                                        # Set flag high for the calibration stage to be done
 
+    cal_in_pin.high()                                   # Turn the Calibration Output Pin ON
 
-# CHANGING THE SLOPE
-def slope_change_interrupt(sl_ch_in_pin):
+# INTERRUPT FOR CONFIRMATION BUTTON
+def confirm_func(conf_in_pin):
+    conf_out_pin.low()
+
     # DEBOUNCE
-    while sl_ch_in_pin.value():         # wait for user to take hand off button
-        utime.sleep_us(1)               # NOP
-    utime.sleep(PA_main["DEBOUNCE_SL"]) # Debounce sleep time
+    while conf_in_pin.value():
+        utime.sleep_us(1)
+    utime.sleep(PA_main["DEBOUNCE_SL"])
 
-    global slope_dir
-    if slope_dir == 1:
-        LED.low()
-        slope_dir = 1
-    else:
-        LED.high()
-        slope_dir = 0
+    global confirm
+    confirm = 1
 
-#################################################################################
-# Phase Offset Calculation
-#################################################################################
+    conf_in_pin.high()
 
-# CONVERT ANALOG VOLTAGE TO PHASE ACCORDING TO AD8302 (really can use either or)
-def volt_2_ph(voltage):
-    # FALLING SLOPE
-    if slope_dir == 1:
-        phase = -94.786 * voltage + 177.15
-        print('Phase Offset = ', phase)
-        return phase
-    # RISING SLOPE
-    elif slope_dir == 0:
-        phase = 94.476 * voltage - 177.44
-        print('Phase Offset = ', phase)
-        return phase
+# AVERAGE CALCULATION FOR MAGNITUDE
+def average_calc():
+    average = 0
+    if index == PA_main["UPPER"]:                       # Looking for the upper mag
+        for a in range(len(mag_array)):
+            average += mag_array[a]
+        average /= len(mag_array)                       # divide the array by size
+        return average
+
+    if index == PA_main["LOWER"]:
+        for a in range(len(mag_array)):
+            average += mag_array[a]
+        average /= len(mag_array)                       # divide the array by size
+        return average
 
 
-# CHECK IF THE MEASURED PHASE IS NEW MAX OR MIN
-def phase_max_min_check():
-    global ph_out_max, ph_out_min
-
-    if ph_out_max < ph_mes:
-        ph_out_max = ph_mes
-
-    elif ph_out_min > ph_mes:
-        ph_out_min = ph_mes
-
-# CHECK IF PHASE VOLTAGE IS MAX OR MIN
-def phase_voltage_close_2_max_min():
-    global repeat, ph_mes, index
-    marker = PA_main["ERROR"]                           # Set the initial variables used to error protocol
-    flag = PA_main["ERROR"]
-    mag_dev_mes = PA_main["ERROR"]
-
-    # THESE CALCULATION IS FOR SLOPE DIRECTION 1. INPA: LEFT ANTENNA,   INPB: RIGHT ANTENNA
-    # ABOVE THE MAX DEVIATION
-    while True:
-        # CHECK PHASE VOLTAGE IN UPPER DEVIATION
-        if ph_mes < (ph_out_max - PA_main["PHASE_DEV"]):
-            break                                   # Get out if measurement is not in Upper Deviation
-        flag = 1                                    # Signal that voltage is in deviation zone
-        marker = PA_main["HIGH_DEV"]                 # Indicate on Max Deviation Region
-        ph_mes = ph_adc_pin.read_u16()              # Change the Phase Voltage value
-        mag_dev_mes = mag_adc_pin.read_u16()        # Use this variable to check if we moved on
-
-    # BELOW THE MIN DEVIATION
-    while True:
-        # CHECK IF THE PHASE VOLTAGE IS IN THE LOWER DEVIATION
-        if ph_mes > (ph_out_min + PA_main["PHASE_DEV"]):
-            break
-        flag = 1                                    # Signal that Village is in Deviation Zone
-        marker = PA_main["LOW_DEV"]
-        ph_mes = ph_adc_pin.read_u16()
-        mag_dev_mes = mag_adc_pin.read_u16()        # Use this variable to check if we moved on
-
-    # TEST CASE FOR RISING SLOPE, UPPER DIV AND IN DEVIATION
-    if (marker == PA_main["HIGH_DEV"]) and (flag == 1) and (slope_dir == 0):
-        if mag_dev_mes > mag_mes:                   # This means that we move onto
-            index = 1                               # move the index
-            repeat = 1
-            return PA_main["FALLING_SLOPE"]         # Configure the slope direction
-    # TEST CASE FOR RISING SLOPE, LOWER DIV AND IN DEVIATION
-    if (marker == PA_main["LOW_DEV"]) and (flag == 1) and (slope_dir == 0):
-        if mag_dev_mes < mag_mes:                   # signal moving left
-            index = 1                               # move the index
-            repeat = -1
-            return PA_main["RISING_SLOPE"]         # Configure the slope direction
+#######################################################################################
+# VARIABLES USED
+#######################################################################################
+cal_prog    = 0                                         # use to jump out of calibration process
+ph_cal      = 0                                         # Calibrated Phase Recording
+ph_mes      = 0                                         # Measured Phase Recording
+ph_mes_up   = 0
+ph_mes_down = 180
+mag_cal     = 0                                         # Calibrated Magnitude Recording
+mag_mes     = 0                                         # Measured Magnitude Recording
+upper_mag   = 0                                         # Measure the magnitude between 1.6 to 1.7 V
+lower_mag   = 0                                         # measure the magnitude between 0.1 to 0.2 V
+mag_array   = []                                        # place holder
+confirm     = 0                                         # FLAG to confirm magnitude captures at THRESHOLD VOLTAGES
+index       = PA_main["CENTER"]                         # Indicate which region is overlap
 
 
-def phase_offset_calculation():
-    if repeat == 1:
-        phase_off = abs(ph_mes[0] + ph_mes[1] - ph_cal)
-    elif repeat == -1:
-        phase_off = abs(ph_mes[0] + 180 - ph_mes[1] - ph_cal)
-    else:
-        phase_off = abs(ph_cal - ph_mes[0])
-
-    return phase_off
-
-
-#################################################################################
+#######################################################################################
 # INITIALIZATION
-#################################################################################
-# VARIABLES
-cal_prog = 0                            # use to jump out of calibration process
-ph_cal = 0                              # Calibrated Phase Recording
-ph_mes = [0, 0]                         # Measured Phase Recording
-mag_cal = 0                             # Calibrated Magnitude Recording
-mag_mes = 0                             # Measured Magnitude Recording
-slope_dir = 1                           # determining which slope is being used for the calculation
-repeat = 0                              # what iteration on repeat
-ph_out_max = 1.8                        # Data Sheet Maximum Phase Voltage Output for AD8302
-ph_out_min = 0.3                        # Data Sheet Minimum Phase Voltage Output for AD8302
-index = 0
+#######################################################################################
+# ON-BOARD LED
+LED = Pin(25, Pin.OUT)                                                      # Set the LED to output
+LED.low()                                                                   # Set the LED OFF
 
-# ON-BOARD LED FOR DEBUGGING
-LED = Pin(25, Pin.OUT)                              # Set the LED to output
-LED.low()                                           # Set the LED OFF
+# CALIBRATION OUTPUT PIN
+cal_out_pin = Pin(PA_main["cal_out_pin"],
+                  Pin.OUT)                                                  # Set Pin 1 to Output
+cal_out_pin.high()                                                          # Put the value high
 
+# CALIBRATION INPUT PIN AS INTERRUPT
+cal_in_pin = Pin(PA_main["cal_in_pin"],
+                 Pin.IN,
+                 Pin.PULL_DOWN)                                             # Set the initial value to zero
+cal_in_pin.irq(trigger=Pin.IRQ_RISING,
+               handler= cal_interrupt)                                          # Set_up input pin as an interupt and run "cal_interrupt" function
 
-# CALIBRATION PIN
-cal_out_pin = Pin(PA_main["CAL_OUT_PIN"],
-                  Pin.OUT)                          # Set Calibration Output Pin to Output
-cal_out_pin.high()                                  # Set the value high
+# CONFIRMATION OUTPUT PIN
+conf_out_pin = Pin(PA_main["CONFIRM_OUT_PIN"],
+                   Pin.OUT)                                                 # Initialize confirmation Output Pin
+conf_out_pin.high()                                                         # Turn Confirm Output Pin ON
 
-cal_in_pin = Pin(PA_main["CAL_IN_PIN"],
-                 Pin.IN,                            # Set Calibration Input Pin to Input
-                 Pin.PULL_DOWN)                     # Enable for logic 1: HIGH
+# CONFIRMATION INPUT PIN AS INTERRUPT
+conf_in_pin = Pin(PA_main["CONFIRM_IN_PIN"], Pin.IN)                        # Configure Confirmation Pin
+conf_in_pin.irq(trigger= Pin.IRQ_RISING,                                    # Set as interrupt for Rising Edge Triggered
+                handler= confirm_func)
 
-cal_in_pin.irq(trigger= Pin.IRQ_RISING,             # Set Interrupt to only trigger on rising edge
-               handler= inter_pin)                  # Set_up input pin as an interrupt and run "inter_pin" function
-
-
-# SLOPE CHANGING PIN
-sl_ch_out_pin = Pin(PA_main["SL_CH_OUT_PIN"],       # Configure the Slope change Pin
-                    Pin.OUT)                        # Set the direction of GPIO
-sl_ch_out_pin.high()
-
-sl_ch_in_pin = Pin(PA_main["SL_CH_IN_PIN"],         # Call Pin 15
-                   Pin.IN,                          # Set GPIO direction as input
-                   Pin.PULL_DOWN)                   # enable pull down resistor
-
-sl_ch_in_pin.irq(trigger= Pin.IRQ_RISING,           # Enable this Pin as Interrupt
-                 handler= slope_change_interrupt)   # Set the function protocol to "slope_change_interrupt" function
-
-# ANALOG-TO-DIGITAL CONVERTER PINS
-ph_adc_pin = ADC(PA_main["ADC_Ch_1"])               # Init Phase ADC Pin
-mag_adc_pin = ADC(PA_main["ADC_Ch_0"])              # Init Mag ADC Pin
+# ANALOG TO DIGITAL CONVERTER PIN
+ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))                                  # Init Phase ADC Pin
+mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))                                 # Init Mag ADC Pin
 
 # INDICATE INIT IS DONE: 'debugging'
 print("Initialization is complete!")
 
+#######################################################################################
 # CALIBRATION PROCESS
-print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'clock position.")
+#######################################################################################
+# INDICATE TO THE USER TO BEING CALIBRATION
+print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'click position.")
 
-
-#################################################################################
-# CALIBRATION
-#################################################################################
+##################################################################################
+# Calibration Routine
+##################################################################################
 # CAPTURE ZERO VALUES OF PHASE AND MAGNITUDE OUTPUT OF AD8302
-while cal_prog == 0:                                # Keep capturing the zero value until user stops with button press
-    ph_cal = ph_adc_pin.read_u16()
+while cal_prog == 0:                                                        # Keep capturing the zero value until user stops with button press
+    ph_cal  = ph_adc_pin.read_u16()
     mag_cal = mag_adc_pin.read_u16()
 
-    ph_cal = volt_2_ph(Senior_Project.dig_2_ana(ph_cal))      # Convert the Digital voltage to Analog and into Phase offset [Degrees]
+    ph_cal  = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_cal), 1) # Convert the Digital voltage to Analog and into Phase offset [Degrees]
 
     # DISPLAY MEASUREMENT TO THE USER
     print('Initial Phase Offset: ', '{:2f}'.format(ph_cal))
-    utime.sleep(1)                                  # sleep for 1 sec
 
-# CALIBRATION DONE. INDICATE WITH LED
-LED.high()                                          # Set value high
-# Note for later: this should indicate that the slope value is 1
+# CONFIRM USER THAT SWEEP RIGHT RAISES VOLTAGE
+print('Hold the signal at 15 degree offset')
 
+# CAPTURE THE 10 DEGREE OFFSET IN ARRAY
+while confirm == 0:                                                         # Wait for the user to confirm
+    utime.sleep_us(1)
+
+# CALCULATE AVERAGE FOR 10 DEGREE OFFSET
+for i in range(PA_main["MAG_SAMPLES"]):
+    mag_array.append(mag_adc_pin.read_u16())                                # create the array
+
+index = PA_main["UPPER"]                                                    # Set this for the magnitude
+upper_mag = average_calc()
+
+print('Hold the signal at 165 degree offset')
+for i in range(len(mag_array)):
+    mag_array[i] = (mag_adc_pin.read_u16())                             # create the array
+
+# CALCULATE AVERAGE FOR 170 DEGREE OFFSET
+index = PA_main["LOWER"]                                                # Set this for the magnitude
+lower_mag = average_calc()
+del mag_array                                                           # delete variable for space
+utime.sleep(1)                                                          # sleep for 1 sec
+
+# MIGHT CHANGE PHASE CAL VALUE TO DEG OFFSET
 ####################################################################
 # The initial value of the phase measurement should be in Degrees
 ####################################################################
 
-####################################################################
+
+
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
-####################################################################
 while True:
-    # CAPTURE THE MEASUREMENT
-    ph_mes[index] = ph_adc_pin.read_u16()
-    mag_mes = mag_adc_pin.read_u16()                  # append adds the newest measurement which is the 4th index
+    # CAPTURE ADC MEAS
+    ph_mes  = ph_adc_pin.read_u16()                                         # Measurement in Digital Voltage
+    mag_mes = mag_adc_pin.read_u16()
 
-    # CALCULATE MAGNITUDE DIFFERENCE FROM CALIBRATION
-    mag_dif = mag_mes - mag_cal
+    # CONVERT PHASE DIGITAL VALUE TO ANALOG
+    ph_mes = Senior_Project.dig_2_ana(ph_mes)                               # Measurement in Analog Voltage
 
-    # CONVERT PHASE MEASUREMENT TO ANALOG
-    ph_mes[index] = Senior_Project.dig_2_ana(ph_mes[index])
+    # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
+    ph_mes = Senior_Project.volt_2_ph(ph_mes, 0)                            # This should make ph_mes in degrees
 
-    # CHECK IF WE ARE AT THE MAX OR MIN DEVIATION
-    phase_voltage_close_2_max_min()
-
-    # CALCULATE PHASE OFFSET
-    phase_offset = phase_offset_calculation()
+    # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
+    ph_dif  = abs(ph_cal - ph_mes)                                           # Calculate the phase
+    print('Phase Difference: ', ph_dif)
+    mag_dif = mag_cal - mag_mes
+    print('Magnitude Difference: ',mag_dif)
 
     # CALCULATE PHASE ARRAY
-    theta = Senior_Project.Phase_array_calc(phase_offset)
+    theta = Senior_Project.Phase_array_calc(ph_dif)
     print('Theta: ', theta)
-
-
     # Display direction to user
     heading = Senior_Project.dir_to_heading(theta, mag_dif)
     Senior_Project.dis_head(heading)
-
-
-
-
-
-
-    ################################################################
-    # Version 2 code
-#    ph_mes = ph_adc_pin.read_u16()  # Measurement in Digital Voltage
-#    mag_mes = mag_adc_pin.read_u16()
-
-    # CONVERT PHASE DIGITAL VALUE TO ANALOG
-#    ph_mes = Senior_Project.dig_2_ana(ph_mes)  # Measurement in Analog Voltage
-
-    # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
-#    ph_mes = Senior_Project.volt_2_ph(ph_mes, 0)  # This should make ph_mes in degrees
-
-    # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
-#    ph_dif = abs(ph_cal - ph_mes)  # Calculate the phase
-#    print('Phase Difference: ', ph_dif)
-#    mag_dif = mag_cal - mag_mes
-#    print('Magnitude Difference: ', mag_dif)
-
-    # CALCULATE PHASE ARRAY
-#    theta = Senior_Project.Phase_array_calc(ph_dif)
-#    print('Theta: ', theta)
-    # Display direction to user
-#    heading = Senior_Project.dir_to_heading(theta, mag_dif)
-#    Senior_Project.dis_head(heading)
-#    utime.sleep(2)
+    utime.sleep(2)

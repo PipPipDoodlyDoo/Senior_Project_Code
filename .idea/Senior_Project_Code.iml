@@ -17,8 +17,10 @@
       <excludeFolder url="file://$MODULE_DIR$/Senior_Project_Code_pip" />
       <excludeFolder url="file://$MODULE_DIR$/Pip_Code_Ver_2" />
       <excludeFolder url="file://$MODULE_DIR$/Pip_Code_Ver_3" />
+      <excludeFolder url="file://$MODULE_DIR$/ALT_CODE" />
+      <excludeFolder url="file://$MODULE_DIR$/Pip_Code_Alt_Code" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="MicroPython" level="project" />
   </component>

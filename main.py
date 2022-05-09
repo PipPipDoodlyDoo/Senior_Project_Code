@@ -5,35 +5,37 @@
 import Senior_Project                                   # Modulating the Code
 from machine import Pin                                 # Use for Calibration Human Interaction
 from machine import ADC                                 # Read Voltage from AD8302
-import utime                                            # Sleep time
+import utime                                            # Sleep time. Use 'utime.sleepus(1)' as NOP no operation
 
 # DICTIONARY "LIBRARY OF VARIABLES THAT WILL BE USED"
 PA_main = {
     "ADC_Ch_0"          : 26,                           # Phase Channel
     "ADC_Ch_1"          : 27,                           # Magnitude Channel
-    "ADC_Ch_2"          : 28,
-    "cal_in_pin"        : 18,                           # Calibration Pin
-    "cal_out_pin"       : 20,
-    "CONFIRM_OUT_PIN"   : 14,
-    "CONFIRM_IN_PIN"    : 15,                           # Confirm Pin used for calibration
+    "ADC_Ch_2"          : 28,                           # Extra ADC Channel
+    "cal_in_pin"        : 18,                           # Calibration Input Pin
+    "cal_out_pin"       : 20,                           # Calibration Output Pin
+    "CONFIRM_OUT_PIN"   : 14,                           # Confirmation Output Pin for Pre-Measurement Protocol
+    "CONFIRM_IN_PIN"    : 15,                           # Confirmation Input Pin for Pre-Measurement Protocol
     # Reference Pin
     "RISING_SLOPE"      : 1,
     "FALLING SLOPE"     : 0,
+    "UPPER_VOLT_THRES"  : 1.65,                          # Threshold Voltages for Phase Output of AD8302
+    "LOWER_VOLT_THRES"  : 0.15,
     "LOWER_DEF"         : 180,                          # Lower Overlap Default value
     "UPPER_DEF"         : 0,                            # Upper Overlap Default value
     "CENTER"            : 0,                            # No overlap
     "UPPER"             : 1,                            # Overlap on the phase lead
     "LOWER"             : -1,                           # Overlap on Phase Lag sides
-    "DEBOUNCE_SL"       : 1,                           # Debounce sleeping time
-    "MAG_SAMPLES"       :15
+    "DEBOUNCE_SL"       : 1,                            # Debounce sleeping time
+    "MAG_SAMPLES"       : 15                            # Amount of samples taken'
 }
 
 # INTERRUPT FOR CALIBRATION DONE BUTTON
-def cal_interrupt(cal_in_pin):                              # Need variable that causes interrupt
-    cal_out_pin.low()                                   # Turn off the Pin
+def cal_interrupt(cal_in_pin):                          # Need variable that causes interrupt
+    cal_out_pin.low()                                   # Turn off Calibration Output Pin
 
-    # DEBOUNCE
-    while cal_in_pin.value():                           # Wait for debounce sleep
+    # DEBOUNCE PROTOCOL
+    while cal_in_pin.value():                           # Wait for user to release Calibration Button
         utime.sleep_us(1)                               # Act as NOP
     utime.sleep(PA_main["DEBOUNCE_SL"])                 # debounce sleep time
 
@@ -46,30 +48,26 @@ def cal_interrupt(cal_in_pin):                              # Need variable that
 def confirm_func(conf_in_pin):
     conf_out_pin.low()
 
-    # DEBOUNCE
+    # DEBOUNCE PROTOCOL
     while conf_in_pin.value():
         utime.sleep_us(1)
     utime.sleep(PA_main["DEBOUNCE_SL"])
 
     global confirm
-    confirm = 1
+    confirm = 1                                         # Set the flag off to confirm for Magnitude Array Measurement
 
     conf_in_pin.high()
 
 # AVERAGE CALCULATION FOR MAGNITUDE
 def average_calc():
+    # INITIALIZE HOLDER VARIABLE FOR AVERAGE CALCULATION
     average = 0
-    if index == PA_main["UPPER"]:                       # Looking for the upper mag
-        for a in range(len(mag_array)):
-            average += mag_array[a]
-        average /= len(mag_array)                       # divide the array by size
-        return average
-
-    if index == PA_main["LOWER"]:
-        for a in range(len(mag_array)):
-            average += mag_array[a]
-        average /= len(mag_array)                       # divide the array by size
-        return average
+    # ADD ALL 'mag_array' ELEMENTS TO AVERAGE
+    for a in range(len(mag_array)):
+        average += mag_array[a]
+    # DIVIDE SUM BY TOTAL NUMBER OF ELEMENTS WITHIN 'mag_array' ARRAY
+    average /= len(mag_array)
+    return average
 
 
 #######################################################################################
@@ -93,34 +91,34 @@ index       = PA_main["CENTER"]                         # Indicate which region 
 # INITIALIZATION
 #######################################################################################
 # ON-BOARD LED
-LED = Pin(25, Pin.OUT)                                                      # Set the LED to output
-LED.low()                                                                   # Set the LED OFF
+LED = Pin(25, Pin.OUT)                                  # Set the LED to output
+LED.low()                                               # Set the LED OFF
 
 # CALIBRATION OUTPUT PIN
 cal_out_pin = Pin(PA_main["cal_out_pin"],
-                  Pin.OUT)                                                  # Set Pin 1 to Output
-cal_out_pin.high()                                                          # Put the value high
+                  Pin.OUT)                              # Set Pin 1 to Output
+cal_out_pin.high()                                      # Put the value high
 
 # CALIBRATION INPUT PIN AS INTERRUPT
 cal_in_pin = Pin(PA_main["cal_in_pin"],
                  Pin.IN,
-                 Pin.PULL_DOWN)                                             # Set the initial value to zero
-cal_in_pin.irq(trigger=Pin.IRQ_RISING,
-               handler= cal_interrupt)                                          # Set_up input pin as an interupt and run "cal_interrupt" function
+                 Pin.PULL_DOWN)                         # Set the initial value to zero
+cal_in_pin.irq(trigger=Pin.IRQ_RISING,                  # Set Interrupt for Rising Edge Trigger
+               handler= cal_interrupt)                  # Run "cal_interrupt" defined function
 
 # CONFIRMATION OUTPUT PIN
 conf_out_pin = Pin(PA_main["CONFIRM_OUT_PIN"],
-                   Pin.OUT)                                                 # Initialize confirmation Output Pin
-conf_out_pin.high()                                                         # Turn Confirm Output Pin ON
+                   Pin.OUT)                             # Initialize confirmation Output Pin
+conf_out_pin.high()                                     # Turn Confirm Output Pin ON
 
 # CONFIRMATION INPUT PIN AS INTERRUPT
-conf_in_pin = Pin(PA_main["CONFIRM_IN_PIN"], Pin.IN)                        # Configure Confirmation Pin
-conf_in_pin.irq(trigger= Pin.IRQ_RISING,                                    # Set as interrupt for Rising Edge Triggered
+conf_in_pin = Pin(PA_main["CONFIRM_IN_PIN"], Pin.IN)    # Configure Confirmation Pin
+conf_in_pin.irq(trigger= Pin.IRQ_RISING,                # Set as interrupt for Rising Edge Triggered
                 handler= confirm_func)
 
 # ANALOG TO DIGITAL CONVERTER PIN
-ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))                                  # Init Phase ADC Pin
-mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))                                 # Init Mag ADC Pin
+ph_adc_pin = ADC(Pin(PA_main["ADC_Ch_1"]))              # Initialize Phase ADC Pin
+mag_adc_pin = ADC(Pin(PA_main["ADC_Ch_0"]))             # Initialize Mag ADC Pin
 
 # INDICATE INIT IS DONE: 'debugging'
 print("Initialization is complete!")
@@ -135,7 +133,8 @@ print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'cli
 # Calibration Routine
 ##################################################################################
 # CAPTURE ZERO VALUES OF PHASE AND MAGNITUDE OUTPUT OF AD8302
-while cal_prog == 0:                                                        # Keep capturing the zero value until user stops with button press
+####################################################################################
+while cal_prog == 0:                                    # Keep capturing the zero value until user stops with button press
     ph_cal  = ph_adc_pin.read_u16()
     mag_cal = mag_adc_pin.read_u16()
 
@@ -144,51 +143,59 @@ while cal_prog == 0:                                                        # Ke
     # DISPLAY MEASUREMENT TO THE USER
     print('Initial Phase Offset: ', '{:2f}'.format(ph_cal))
 
+# NOTE: THIS MEASUREMENT IS MADE FOR INPUT B PHASE LAGGING. Meaning that as the signal heads right relative to drones flying direction
+#         the voltage should increase so the 2 input phase should be aligning
+
 # CONFIRM USER THAT SWEEP RIGHT RAISES VOLTAGE
 print('Hold the signal at 15 degree offset')
 
 # CAPTURE THE 10 DEGREE OFFSET IN ARRAY
-while confirm == 0:                                                         # Wait for the user to confirm
+while confirm == 0:                                     # Wait for the user to confirm
     utime.sleep_us(1)
 
 # CALCULATE AVERAGE FOR 10 DEGREE OFFSET
-for i in range(PA_main["MAG_SAMPLES"]):
-    mag_array.append(mag_adc_pin.read_u16())                                # create the array
+for i in range(PA_main["MAG_SAMPLES"]):                 # define array size from library definition
+    mag_array.append(mag_adc_pin.read_u16())            # create the array
 
-index = PA_main["UPPER"]                                                    # Set this for the magnitude
+# SET THE MAGNITUDE FOR AVERAGE CALCULATION FOR THE WHOLE UPPER MAGNITUDE
 upper_mag = average_calc()
 
+
 print('Hold the signal at 165 degree offset')
-for i in range(len(mag_array)):
-    mag_array[i] = (mag_adc_pin.read_u16())                             # create the array
+for i in range(len(mag_array)):                         # Array size already set therefore just loop array size
+    mag_array[i] = (mag_adc_pin.read_u16())             # Re-write Magnitude Array
 
 # CALCULATE AVERAGE FOR 170 DEGREE OFFSET
-index = PA_main["LOWER"]                                                # Set this for the magnitude
 lower_mag = average_calc()
-del mag_array                                                           # delete variable for space
-utime.sleep(1)                                                          # sleep for 1 sec
+
+# DELETE VARIABLE TO MAKE SPACE
+del mag_array
+utime.sleep(1)                                          # sleep for 1 sec
 
 # MIGHT CHANGE PHASE CAL VALUE TO DEG OFFSET
 ####################################################################
 # The initial value of the phase measurement should be in Degrees
 ####################################################################
 
-
-
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
 while True:
     # CAPTURE ADC MEAS
-    ph_mes  = ph_adc_pin.read_u16()                                         # Measurement in Digital Voltage
+    ph_mes  = ph_adc_pin.read_u16()                     # Measurement in Digital Voltage
     mag_mes = mag_adc_pin.read_u16()
 
     # CONVERT PHASE DIGITAL VALUE TO ANALOG
-    ph_mes = Senior_Project.dig_2_ana(ph_mes)                               # Measurement in Analog Voltage
+    ph_mes = Senior_Project.dig_2_ana(ph_mes)           # Measurement in Analog Voltage
+
+    ####################################################################
+    # Check the Voltage if it hit the max or min
+    ####################################################################
+
 
     # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
-    ph_mes = Senior_Project.volt_2_ph(ph_mes, 0)                            # This should make ph_mes in degrees
+    ph_mes = Senior_Project.volt_2_ph(ph_mes, 0)        # This should make ph_mes in degrees
 
     # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
-    ph_dif  = abs(ph_cal - ph_mes)                                           # Calculate the phase
+    ph_dif  = abs(ph_cal - ph_mes)                      # Calculate the phase
     print('Phase Difference: ', ph_dif)
     mag_dif = mag_cal - mag_mes
     print('Magnitude Difference: ',mag_dif)

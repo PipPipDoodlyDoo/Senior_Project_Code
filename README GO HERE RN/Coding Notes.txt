@@ -340,12 +340,30 @@ OUTPUT:
     yes
 ___________________________________________________________________________
 Flow for ALT_CODE
+            REFER THE VOTLAGE AS INPUT B LEADS OR LAGS INPUT A
 ISSUES:
     - Don't know if there is a lot of CONSTRUCTIVE/DECONSTRUCTIVE INTERFERENCE within Microwave Lab
+
+VARIABLES:
+    - cal_prog      : Calibration Flag. Allows us to place signal 12 o'clock and set the initial phase and
+                        magnitude measurements
+    - ph_cal        : Calibrated Phase Offset Measurement. Used to calculate the delta Phi used within the
+                        Phase Array Calculation
+    - ph_mes_up     : Used for INPUT B PHASE LAG overlap for delta phi calculation
+    - ph_mes_down   : Used for INPUT B PHASE LEAD overlap for delta phi calculation
+    - mag_cal       : Calibrated Magnitude Measurement. This will be used to determine if the signal is left/right
+    - mag_mes       : Measured Magnitude after Calibration to find direction Left/Right
+    - upper_mag     : Magnitude Pre-Measurement for 15 deg offset on Output for AD8302
+    - lower_mag     : Magnitude Pre-Measurement for 165 deg offset on Output for AD8302
+    - mag_array     : "36" element array used to calculate average for 'upper_mag' & 'lower_mag'
+    - confirm       : Flag used for user to confirm that the user signal is placed at 'upper_mag' & 'lower_mag'
+                        region for Pre-Measurement Calibration Protocol.
+    - index         : Used to determine which region of overlap the signal is
+
+
 NEED TO DO:
     -[] Test with the oscilloscope or DMM if the voltage stays constant at 1.6 - 1.7 and 0.2 - 0.1V
         (Voltage markings: 15 degree -> 0.15V [UPPER]  165 Degree -> 1.65V [LOWER])
-            REFER the Voltage as INPUT B LEADS or LAGS INPUT A
 
 INTERRUPTS:
     -[] "cal_interrupt"     : Set (cal_prog == 1) to pass through calibration stage

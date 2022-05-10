@@ -3,22 +3,22 @@ import math
 
 # DICTIONARY FOR SOURCE FILE
 SP_LIB = {
-    "REF_VOLT"  : 3.3,                          # Reference Voltage for ADC
-    "BIT_RES"   : 65535,                        # Bit Resolution for ADC
-    "DIST"      : 1.65,                         # distance between antennas [meters] (76 cm)
-    "BETA"      : 3.466,                        # Beta for 165.5 MHz
-    "LAMBDA"    : 1.812,                        # wavelength for 165.5 MHz
-    "NUM_ELEM"  : 2,                            # Number of Elements
-    "3 o'clock" : 0,                            # direction headings
-    "2 o'clock" : 1,
-    "1 o'clock" : 2,
-    "12 o'clock": 3,
-    "11 o'clock": 4,
-    "10 o'clock": 5,
-    "9 o'clock" : 6,
-    "ERROR"     : 7,
-    "RISING_SLOPE": 1,
-    "FALLING SLOPE": 0
+    "REF_VOLT"      : 3.3,                          # Reference Voltage for ADC
+    "BIT_RES"       : 65535,                        # Bit Resolution for ADC
+    "DIST"          : 1.65,                         # distance between antennas [meters] (76 cm)
+    "BETA"          : 3.466,                        # Beta for 165.5 MHz
+    "LAMBDA"        : 1.812,                        # wavelength for 165.5 MHz
+    "NUM_ELEM"      : 2,                            # Number of Elements
+    "3 o'clock"     : 0,                            # direction headings
+    "2 o'clock"     : 1,
+    "1 o'clock"     : 2,
+    "12 o'clock"    : 3,
+    "11 o'clock"    : 4,
+    "10 o'clock"    : 5,
+    "9 o'clock"     : 6,
+    "ERROR"         : 7,
+    "RISING_SLOPE"  : 1,
+    "FALLING_SLOPE" : 0
 }
 
 # DIGITAL TO ANALOG CONVERTOR
@@ -29,12 +29,13 @@ def dig_2_ana(dig_value):
 
 # ANALOG TO PHASE OFFSET CONVERTOR
 def volt_2_ph(voltage, half):
-    if half == SP_LIB["RISING_SLOPE"]:
+    if half == SP_LIB["FALLING_SLOPE"]:
         phase = abs(-94.786 * voltage + 177.15)
         print('Phase Offset = ', phase)
         return phase
-    elif half == SP_LIB["FALLING SLOPE"]:
-        phase = abs(94.476 * voltage - 177.44)
+    elif half == SP_LIB["RISING_SLOPE"]:
+#        phase = abs(94.476 * voltage - 177.44)                         # Original
+        phase = abs(94.476 * voltage)                         # New Version. As Voltage INCREASES so does phase shift
         phase = abs(phase)
         print('Phase Offset = ', phase)
         return phase

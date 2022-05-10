@@ -358,7 +358,7 @@ VARIABLES:
     - mag_array     : "36" element array used to calculate average for 'upper_mag' & 'lower_mag'
     - confirm       : Flag used for user to confirm that the user signal is placed at 'upper_mag' & 'lower_mag'
                         region for Pre-Measurement Calibration Protocol.
-    - index         : Used to determine which region of overlap the signal is
+    - index         : Used to determine which region of overlap we are currently in
 
 
 NEED TO DO:
@@ -377,3 +377,4 @@ MAIN_CODE:
                                 is placed in front (relative to flight path)
         ""
 
+! Changed the function for more the voltage increases the more phase shift.

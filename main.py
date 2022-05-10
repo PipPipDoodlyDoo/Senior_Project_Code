@@ -19,15 +19,16 @@ PA_main = {
     # Reference Pin
     "RISING_SLOPE"      : 1,
     "FALLING SLOPE"     : 0,
-    "UPPER_VOLT_THRES"  : 1.65,                          # Threshold Voltages for Phase Output of AD8302
+    "UPPER_VOLT_THRES"  : 1.65,                         # Threshold Voltages for Phase Output of AD8302
     "LOWER_VOLT_THRES"  : 0.15,
-    "LOWER_DEF"         : 180,                          # Lower Overlap Default value
-    "UPPER_DEF"         : 0,                            # Upper Overlap Default value
-    "CENTER"            : 0,                            # No overlap
-    "UPPER"             : 1,                            # Overlap on the phase lead
-    "LOWER"             : -1,                           # Overlap on Phase Lag sides
+    "DEFAULT_PH_SHIFT"  : 0,                            # Default Phase Shift used for forcing overlapping elements to 0
+    "CENTER_REGION"     : 0,                            # No overlap
+    "UPPER_REGION"      : 1,                            # Overlap on the phase lead
+    "LOWER_REGION"      : -1,                           # Overlap on Phase Lag sides
     "DEBOUNCE_SL"       : 1,                            # Debounce sleeping time
-    "MAG_SAMPLES"       : 15                            # Amount of samples taken'
+    "MAG_SAMPLES"       : 15,                           # Amount of samples taken'
+    "MAG_BUFFER"        : 0.1                           # Buffer Voltage to check for the overlap. Use with UPPER AND LOWER THRESHOLD VOLTAGES
+
 }
 ####################################################################
 # Interrupt Functions
@@ -66,6 +67,7 @@ def confirm_func(conf_in_pin):
 # THIS WILL BE CALCULATING WHETHER THE SIGNAL IS AT THE MAX OR MIN THRESHOLD
 def max_min_check():
     # we have to globalize index and switching the ph_mes.
+    #USE THE THRESSHOLD VOLTAGE BUFFER LOCATED ON THE LIBRARY INDEX
 
 # AVERAGE CALCULATION FOR MAGNITUDE
 def average_calc():
@@ -86,7 +88,7 @@ cal_prog    = 0                                         # use to jump out of cal
 ph_cal      = 0                                         # Calibrated Phase Recording
 ph_mes      = 0                                         # Measured Phase Recording
 ph_mes_up   = 0
-ph_mes_down = 180
+ph_mes_down = -180                                      # Mainly using the rising slope
 mag_cal     = 0                                         # Calibrated Magnitude Recording
 mag_mes     = 0                                         # Measured Magnitude Recording
 upper_mag   = 0                                         # Measure the magnitude between 1.6 to 1.7 V
@@ -143,12 +145,15 @@ print("Begin Calibration Process.\n Please place the Transmitter in the 12 o'cli
 ##################################################################################
 # CAPTURE ZERO VALUES OF PHASE AND MAGNITUDE OUTPUT OF AD8302
 ####################################################################################
-while cal_prog == 0:                                    # Keep capturing the zero value until user stops with button press
+while cal_prog == 0:                                                # Keep capturing the zero value until user stops with button press
+    # READ ADC PIN VOLTAGES
     ph_cal  = ph_adc_pin.read_u16()
     mag_cal = mag_adc_pin.read_u16()
 
-    ph_cal  = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_cal), 1) # Convert the Digital voltage to Analog and into Phase offset [Degrees]
-
+    # CONVERT VOLTAGES TO ANALOG
+    ph_cal  = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_cal),
+                                       PA_main["RISING_SLOPE"])     # Convert the Digital voltage to Analog and into Phase offset [Degrees]
+    mag_cal = Senior_Project.dig_2_ana(mag_cal)
     # DISPLAY MEASUREMENT TO THE USER
     print('Initial Phase Offset: ', '{:2f}'.format(ph_cal))
 
@@ -168,7 +173,7 @@ for i in range(PA_main["MAG_SAMPLES"]):                 # define array size from
 
 # SET THE MAGNITUDE FOR AVERAGE CALCULATION FOR THE WHOLE UPPER MAGNITUDE
 upper_mag = average_calc()
-
+upper_mag = Senior_Project.dig_2_ana(upper_mag)         # Change digital to analog voltage
 
 print('Hold the signal at 165 degree offset')
 for i in range(len(mag_array)):                         # Array size already set therefore just loop array size
@@ -176,6 +181,7 @@ for i in range(len(mag_array)):                         # Array size already set
 
 # CALCULATE AVERAGE FOR 170 DEGREE OFFSET
 lower_mag = average_calc()
+lower_mag = Senior_Project.dig_2_ana(lower_mag)         # Change to a voltage
 
 # DELETE VARIABLE TO MAKE SPACE
 del mag_array
@@ -191,7 +197,24 @@ while True:
     # CAPTURE ADC MEAS
     ##### MAY NEED TO DO IF STATEMENT TO CHANGE THE RECORDED VALUE DEPENDING ON REGION OF CAPTURE
     # UPPER AND LOWER OVERLAPS
-    ph_mes  = ph_adc_pin.read_u16()                     # Measurement in Digital Voltage
+    # NO OVERLAP CASE
+    if index == PA_main["CENTER_REGION"]:
+        ph_mes = ph_adc_pin.read_u16()                      # Take measurement regularly
+        ph_mes_up = PA_main["DEFAULT_PH_SHIFT"]             # Force Upper measurement to be 0 phase contribution
+        ph_mes_down = PA_main["DEFAULT_PH_SHIFT"]           # Force Lower to be 0 phase Contribution when calculating
+
+    # UPPER REGION OF OVERLAP
+    elif index == PA_main["UPPER_REGION"]:
+        ph_mes = 180                                        # Preset the Phase Shift to 180 degree offset
+        ph_mes_up = ph_adc_pin.read_u16()                   # The upper is reading the phase offset from AD8302
+        ph_mes_down = PA_main["DEFAULT_PH_SHIFT"]           # No Contribution
+
+    # LOWER REGION OF OVERLAP
+    elif index == PA_main["LOWER_REGION"]
+        ph_mes = 0                                          # Preset to the lower limit
+        ph_mes_up = PA_main["DEFAULT_PH_SHIFT"]             # No Contribution
+        ph_mes_down = ph_adc_pin.read_u16()                 # The lower half becomes the ADC Read Pin now
+
     mag_mes = mag_adc_pin.read_u16()
 
     # CONVERT PHASE DIGITAL VALUE TO ANALOG

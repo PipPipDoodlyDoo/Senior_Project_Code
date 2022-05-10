@@ -28,17 +28,19 @@ def dig_2_ana(dig_value):
     return analog_value
 
 # ANALOG TO PHASE OFFSET CONVERTOR
-def volt_2_ph(voltage, half):
-    if half == SP_LIB["FALLING_SLOPE"]:
-        phase = abs(-94.786 * voltage + 177.15)
-        print('Phase Offset = ', phase)
-        return phase
-    elif half == SP_LIB["RISING_SLOPE"]:
-#        phase = abs(94.476 * voltage - 177.44)                         # Original
-        phase = abs(94.476 * voltage)                         # New Version. As Voltage INCREASES so does phase shift
-        phase = abs(phase)
-        print('Phase Offset = ', phase)
-        return phase
+def volt_2_ph(voltage):
+    # if half == SP_LIB["FALLING_SLOPE"]:
+    #     phase = abs(-94.786 * voltage + 177.15)
+    #     print('Phase Offset = ', phase)
+    #     return phase
+    # elif half == SP_LIB["RISING_SLOPE"]:
+    #     #        phase = abs(94.476 * voltage - 177.44)                         # Original
+    #     phase = abs(phase)
+
+    # NEW VERSION. AS VOLTAGE INCREASES SO DOES PHASE OFFSET
+    phase = abs(94.476 * voltage)
+    print('Phase Offset = ', phase)
+    return phase
 
 # PHASE ARRAY CALCULATION: (Relative to drone's flying direction)
 def Phase_array_calc(phase):

@@ -65,9 +65,42 @@ def confirm_func(conf_in_pin):
 # Functions
 ####################################################################
 # THIS WILL BE CALCULATING WHETHER THE SIGNAL IS AT THE MAX OR MIN THRESHOLD
-def max_min_check():
+def max_min_check(ph_initial):
     # we have to globalize index and switching the ph_mes.
+    global index, mag_mes, ph_mes
+    # MOMENTARY VARIABLES THAT WILL BE USED
+    flag = 0                                            # Flag used to show where we are
+
+    ph_mes = ph_initial                                 # Reset the initial voltage
+
     #USE THE THRESSHOLD VOLTAGE BUFFER LOCATED ON THE LIBRARY INDEX
+    # UPPER THRESHOLD
+    while ph_mes >= PA_main["UPPER_VOLT_THRES"]:        # Check if the phase voltage is upper ambiguity region
+        # CAPTURE ADC MEASUREMENTS
+        mag_mes = mag_adc_pin.read_u16()
+        ph_mes = ph_adc_pin.read_u16()
+        flag = 1
+
+    if flag == PA_main["UPPER_REGION"]:                     # Indicate which region we are in
+        if mag_mes >= (upper_mag + PA_main["MAG_BUFFER"]):  # Check the magnitude if it is higher than before
+            index = PA_main["UPPER_REGION"]                 # Set the index for operating at
+
+            ph_mes_up = ph_mes                              # This will be the new measurement
+            ph_mes = PA_main["DEFAULT_PH_SHIFT"]            # Reset to max
+
+
+        else:
+            index = PA_main["CENTER_REGION"]                # Reset to center region
+
+    elif flag == PA_main["LOWER_REGION"]:                   # Check which region we are working wiht
+        if mag_mes <= (lower_mag - PA_main["MAG_BUFFER"]):  # Check the magnitude to see if pass through into lower region
+            index = PA_main["LOWER_REGION"]                 # Set to lower region for calculation
+        else:
+            index = PA_main["CENTER_REGION"]                # Reset to center region
+
+
+
+
 
 # AVERAGE CALCULATION FOR MAGNITUDE
 def average_calc():
@@ -151,8 +184,7 @@ while cal_prog == 0:                                                # Keep captu
     mag_cal = mag_adc_pin.read_u16()
 
     # CONVERT VOLTAGES TO ANALOG
-    ph_cal  = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_cal),
-                                       PA_main["RISING_SLOPE"])     # Convert the Digital voltage to Analog and into Phase offset [Degrees]
+    ph_cal  = Senior_Project.volt_2_ph(Senior_Project.dig_2_ana(ph_cal))     # Convert the Digital voltage to Analog and into Phase offset [Degrees]
     mag_cal = Senior_Project.dig_2_ana(mag_cal)
     # DISPLAY MEASUREMENT TO THE USER
     print('Initial Phase Offset: ', '{:2f}'.format(ph_cal))
@@ -200,8 +232,13 @@ while True:
     # NO OVERLAP CASE
     if index == PA_main["CENTER_REGION"]:
         ph_mes = ph_adc_pin.read_u16()                      # Take measurement regularly
+        ph_mes = Senior_Project.dig_2_ana(ph_mes)
+        ph_mes = Senior_Project.volt_2_ph(ph_mes)
+
         ph_mes_up = PA_main["DEFAULT_PH_SHIFT"]             # Force Upper measurement to be 0 phase contribution
         ph_mes_down = PA_main["DEFAULT_PH_SHIFT"]           # Force Lower to be 0 phase Contribution when calculating
+
+        max_min_check(ph_mes)                               # Check if we are on the threshold
 
     # UPPER REGION OF OVERLAP
     elif index == PA_main["UPPER_REGION"]:
@@ -209,8 +246,10 @@ while True:
         ph_mes_up = ph_adc_pin.read_u16()                   # The upper is reading the phase offset from AD8302
         ph_mes_down = PA_main["DEFAULT_PH_SHIFT"]           # No Contribution
 
+        max_min_check()
+
     # LOWER REGION OF OVERLAP
-    elif index == PA_main["LOWER_REGION"]
+    elif index == PA_main["LOWER_REGION"]:
         ph_mes = 0                                          # Preset to the lower limit
         ph_mes_up = PA_main["DEFAULT_PH_SHIFT"]             # No Contribution
         ph_mes_down = ph_adc_pin.read_u16()                 # The lower half becomes the ADC Read Pin now
@@ -218,16 +257,18 @@ while True:
     mag_mes = mag_adc_pin.read_u16()
 
     # CONVERT PHASE DIGITAL VALUE TO ANALOG
-    ph_mes = Senior_Project.dig_2_ana(ph_mes)           # Measurement in Analog Voltage
+
 
     ####################################################################
     # Check the Voltage if it hit the max or min
     ####################################################################
 
 
+
+
     # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
-    ph_mes = Senior_Project.volt_2_ph(ph_mes,           # This should make ph_mes in degrees
-                                      PA_main["RISING_SLOPE"])
+    ph_mes = Senior_Project.volt_2_ph(ph_mes)           # This should make ph_mes in degrees
+
 
     # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
     ph_dif  = abs(ph_cal - ph_mes)                      # Calculate the phase

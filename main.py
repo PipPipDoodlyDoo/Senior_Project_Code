@@ -29,7 +29,9 @@ PA_main = {
     "DEBOUNCE_SL"       : 1,                            # Debounce sleeping time
     "MAG_SAMPLES"       : 15                            # Amount of samples taken'
 }
-
+####################################################################
+# Interrupt Functions
+####################################################################
 # INTERRUPT FOR CALIBRATION DONE BUTTON
 def cal_interrupt(cal_in_pin):                          # Need variable that causes interrupt
     cal_out_pin.low()                                   # Turn off Calibration Output Pin
@@ -57,6 +59,13 @@ def confirm_func(conf_in_pin):
     confirm = 1                                         # Set the flag off to confirm for Magnitude Array Measurement
 
     conf_in_pin.high()
+
+####################################################################
+# Functions
+####################################################################
+# THIS WILL BE CALCULATING WHETHER THE SIGNAL IS AT THE MAX OR MIN THRESHOLD
+def max_min_check():
+    # we have to globalize index and switching the ph_mes.
 
 # AVERAGE CALCULATION FOR MAGNITUDE
 def average_calc():
@@ -180,6 +189,8 @@ utime.sleep(1)                                          # sleep for 1 sec
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
 while True:
     # CAPTURE ADC MEAS
+    ##### MAY NEED TO DO IF STATEMENT TO CHANGE THE RECORDED VALUE DEPENDING ON REGION OF CAPTURE
+    # UPPER AND LOWER OVERLAPS
     ph_mes  = ph_adc_pin.read_u16()                     # Measurement in Digital Voltage
     mag_mes = mag_adc_pin.read_u16()
 
@@ -192,7 +203,8 @@ while True:
 
 
     # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
-    ph_mes = Senior_Project.volt_2_ph(ph_mes, 0)        # This should make ph_mes in degrees
+    ph_mes = Senior_Project.volt_2_ph(ph_mes,           # This should make ph_mes in degrees
+                                      PA_main["RISING_SLOPE"])
 
     # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
     ph_dif  = abs(ph_cal - ph_mes)                      # Calculate the phase

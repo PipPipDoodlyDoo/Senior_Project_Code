@@ -224,6 +224,24 @@ utime.sleep(1)                                          # sleep for 1 sec
 # The initial value of the phase measurement should be in Degrees
 ####################################################################
 
+
+
+
+
+
+
+
+
+
+# LEFT OFF HERE
+
+
+
+
+
+
+
+
 # FOREVER LOOP TO CALCULATE PHASE ARRAY AND DISPLAY TO USER
 while True:
     # CAPTURE ADC MEAS

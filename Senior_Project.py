@@ -3,22 +3,27 @@ import math
 
 # DICTIONARY FOR SOURCE FILE
 SP_LIB = {
-    "REF_VOLT"      : 3.3,                          # Reference Voltage for ADC
-    "BIT_RES"       : 65535,                        # Bit Resolution for ADC
-    "DIST"          : 1.65,                         # distance between antennas [meters] (76 cm)
-    "BETA"          : 3.466,                        # Beta for 165.5 MHz
-    "LAMBDA"        : 1.812,                        # wavelength for 165.5 MHz
-    "NUM_ELEM"      : 2,                            # Number of Elements
-    "3 o'clock"     : 0,                            # direction headings
-    "2 o'clock"     : 1,
-    "1 o'clock"     : 2,
-    "12 o'clock"    : 3,
-    "11 o'clock"    : 4,
-    "10 o'clock"    : 5,
-    "9 o'clock"     : 6,
-    "ERROR"         : 7,
-    "RISING_SLOPE"  : 1,
-    "FALLING_SLOPE" : 0
+    "REF_VOLT"          : 3.3,                      # Reference Voltage for ADC
+    "BIT_RES"           : 65535,                    # A bit of Resolution for ADC
+    "DIST"              : 1.65,                     # distance between antennas [meters] (76 cm)
+    "BETA"              : 3.466,                    # Beta for 165.5 MHz
+    "LAMBDA"            : 1.812,                    # wavelength for 165.5 MHz
+    "NUM_ELEM"          : 2,                        # Number of Elements
+    "3 o'clock"         : 0,                        # direction headings
+    "2 o'clock"         : 1,
+    "1 o'clock"         : 2,
+    "12 o'clock"        : 3,
+    "11 o'clock"        : 4,
+    "10 o'clock"        : 5,
+    "9 o'clock"         : 6,
+    "ERROR"             : 7,
+    "RISING_SLOPE"      : 1,
+    "FALLING_SLOPE"     : 0,
+    "DEFAULT_PH_SHIFT"  : 0,                        # Default Phase Shift used for forcing overlapping elements to 0
+    "DEFAULT_PH_SH_UP"  : 180,                      # From the calculations and slope manipulation this is what came out
+    "CENTER_REGION"     : 0,                        # No overlap
+    "UPPER_REGION"      : 1,                        # Overlap on the phase lead
+    "LOWER_REGION"      : -1                        # Overlap on Phase Lag sides
 }
 
 # DIGITAL TO ANALOG CONVERTOR
@@ -39,8 +44,33 @@ def volt_2_ph(voltage):
 
     # NEW VERSION. AS VOLTAGE INCREASES SO DOES PHASE OFFSET
     phase = abs(94.476 * voltage)
+
+    # SET SOME LIMITS
+    if phase > 180:
+        phase = 180
+
+    elif phase < 0:
+        phase = 0
+
     print('Phase Offset = ', phase)
     return phase
+
+def phase_offset_calculation(index, current_phase, calibrated_phase):
+    if index == SP_LIB["CENTER_REGION"]:
+        phase_offset = abs(calibrated_phase - current_phase)
+        return phase_offset
+
+    elif index == SP_LIB["UPPER_REGION"]:
+        # SINCE THIS IS A PEAK, THE CONTRIBUTION IS OFF BY 180 DEGREES THAT IS WHY WE HAVE A 180 - CURRENT PHASE MEASUREMENTS
+        phase_offset = (SP_LIB["DEFAULT_PH_SH_UP"] - calibrated_phase) + (180 - current_phase)
+        return phase_offset
+
+    elif index == SP_LIB["LOWER_REGION"]:
+        # THIS IS THE TROPH OUTPUT OF AD83O2 THEREFORE THE CONTRIBUTION OF PHASE OFFSET IS
+        # A SIMPLE ADDITION
+        phase_offset = (calibrated_phase + current_phase)
+        return phase_offset
+
 
 # PHASE ARRAY CALCULATION: (Relative to drone's flying direction)
 def Phase_array_calc(phase):

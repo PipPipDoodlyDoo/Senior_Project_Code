@@ -22,11 +22,12 @@ PA_main = {
     "UPPER_VOLT_THRES"  : 1.65,                         # Threshold Voltages for Phase Output of AD8302
     "LOWER_VOLT_THRES"  : 0.15,
     "DEFAULT_PH_SHIFT"  : 0,                            # Default Phase Shift used for forcing overlapping elements to 0
+    "DEFAULT_PH_SH_UP"  : 180,                          #
     "CENTER_REGION"     : 0,                            # No overlap
     "UPPER_REGION"      : 1,                            # Overlap on the phase lead
     "LOWER_REGION"      : -1,                           # Overlap on Phase Lag sides
     "DEBOUNCE_SL"       : 1,                            # Debounce sleeping time
-    "MAG_SAMPLES"       : 15,                           # Amount of samples taken'
+    "MAG_SAMPLES"       : 15,                            # Amount of samples taken'
     "MAG_BUFFER"        : 0.1                           # Buffer Voltage to check for the overlap. Use with UPPER AND LOWER THRESHOLD VOLTAGES
 
 }
@@ -67,40 +68,63 @@ def confirm_func(conf_in_pin):
 # THIS WILL BE CALCULATING WHETHER THE SIGNAL IS AT THE MAX OR MIN THRESHOLD
 def max_min_check(ph_initial):
     # we have to globalize index and switching the ph_mes.
-    global index, mag_mes, ph_mes
+    global index, mag_mes, ph_mes, flag, ph_mes_up, ph_mes_down
     # MOMENTARY VARIABLES THAT WILL BE USED
     flag = 0                                            # Flag used to show where we are
-
     ph_mes = ph_initial                                 # Reset the initial voltage
+    # The center region is the common ground between UPPER AND LOWER REGION so that is why we will force
+    # the ph_mes to be the ph usage here
+
 
     #USE THE THRESSHOLD VOLTAGE BUFFER LOCATED ON THE LIBRARY INDEX
     # UPPER THRESHOLD
-    while ph_mes >= PA_main["UPPER_VOLT_THRES"]:        # Check if the phase voltage is upper ambiguity region
+    while ph_mes >= PA_main["UPPER_VOLT_THRES"]:            # Check if the phase voltage is within UPPER ambiguity region
         # CAPTURE ADC MEASUREMENTS
         mag_mes = mag_adc_pin.read_u16()
         ph_mes = ph_adc_pin.read_u16()
-        flag = 1
 
+        flag = PA_main["UPPER_REGION"]                      # Set off the flag that there was an Upper Threshold tirggered
+
+    # LOWER THRESHOLD
+    while ph_mes <= PA_main["LOWER_VOLT_THRES"]:
+        # CAPTURE ADC MEASUREMENTS
+        mag_mes = mag_adc_pin.read_u16()
+        ph_mes = ph_adc_pin.read_u16()
+
+        flag = PA_main["LOWER_REGION"]                      # Set off flag for Lower Threshold disturbance
+
+    # CHANGE THE INDEX IF THERE WAS A DISTURBANCE
     if flag == PA_main["UPPER_REGION"]:                     # Indicate which region we are in
         if mag_mes >= (upper_mag + PA_main["MAG_BUFFER"]):  # Check the magnitude if it is higher than before
             index = PA_main["UPPER_REGION"]                 # Set the index for operating at
 
             ph_mes_up = ph_mes                              # This will be the new measurement
-            ph_mes = PA_main["DEFAULT_PH_SHIFT"]            # Reset to max
-
+            ph_mes = PA_main["DEFAULT_PH_SH_UP"]            # Reset to max
 
         else:
             index = PA_main["CENTER_REGION"]                # Reset to center region
+
 
     elif flag == PA_main["LOWER_REGION"]:                   # Check which region we are working wiht
         if mag_mes <= (lower_mag - PA_main["MAG_BUFFER"]):  # Check the magnitude to see if pass through into lower region
             index = PA_main["LOWER_REGION"]                 # Set to lower region for calculation
+
+            ph_mes_down = ph_mes
+            ph_mes = PA_main["DEFAULT_PH_SHIFT"]
+
         else:
             index = PA_main["CENTER_REGION"]                # Reset to center region
+            # no need to change the ph_mes because that is what the center region uses already
 
+def display_phase():
+    phase = ph_adc_pin.read_u16()                           # Read the ADC Pin
+    phase = Senior_Project.dig_2_ana(phase)                 # Convert Digital to analog
 
+    phase = Senior_Project.volt_2_ph(phase)                 # Convert the voltage to a phase
 
+    print('Current phase offset = ', phase)
 
+    
 
 # AVERAGE CALCULATION FOR MAGNITUDE
 def average_calc():
@@ -128,6 +152,7 @@ upper_mag   = 0                                         # Measure the magnitude 
 lower_mag   = 0                                         # measure the magnitude between 0.1 to 0.2 V
 mag_array   = []                                        # place holder
 confirm     = 0                                         # FLAG to confirm magnitude captures at THRESHOLD VOLTAGES
+flag        = 0                                         # Use this to check if there is an instance of change
 index       = PA_main["CENTER"]                         # Indicate which region is overlap
 
 
@@ -197,7 +222,8 @@ print('Hold the signal at 15 degree offset')
 
 # CAPTURE THE 10 DEGREE OFFSET IN ARRAY
 while confirm == 0:                                     # Wait for the user to confirm
-    utime.sleep_us(1)
+    display_phase()
+    utime.sleep_ms(1)
 
 # CALCULATE AVERAGE FOR 10 DEGREE OFFSET
 for i in range(PA_main["MAG_SAMPLES"]):                 # define array size from library definition
@@ -207,7 +233,13 @@ for i in range(PA_main["MAG_SAMPLES"]):                 # define array size from
 upper_mag = average_calc()
 upper_mag = Senior_Project.dig_2_ana(upper_mag)         # Change digital to analog voltage
 
+confirm = 0                                             # Reset the flag
+
 print('Hold the signal at 165 degree offset')
+while confirm == 0:
+    display_phase()
+    utime.sleep_ms(1)
+
 for i in range(len(mag_array)):                         # Array size already set therefore just loop array size
     mag_array[i] = (mag_adc_pin.read_u16())             # Re-write Magnitude Array
 
@@ -216,7 +248,7 @@ lower_mag = average_calc()
 lower_mag = Senior_Project.dig_2_ana(lower_mag)         # Change to a voltage
 
 # DELETE VARIABLE TO MAKE SPACE
-del mag_array
+del mag_array, confirm
 utime.sleep(1)                                          # sleep for 1 sec
 
 # MIGHT CHANGE PHASE CAL VALUE TO DEG OFFSET
@@ -250,21 +282,28 @@ while True:
     # NO OVERLAP CASE
     if index == PA_main["CENTER_REGION"]:
         ph_mes = ph_adc_pin.read_u16()                      # Take measurement regularly
+        # CONVERT VOLTAGE FROM DIGITAL TO ANALOG VOLTAGE
         ph_mes = Senior_Project.dig_2_ana(ph_mes)
-        ph_mes = Senior_Project.volt_2_ph(ph_mes)
+        max_min_check(ph_mes)  # Check if we are on the threshold
 
         ph_mes_up = PA_main["DEFAULT_PH_SHIFT"]             # Force Upper measurement to be 0 phase contribution
         ph_mes_down = PA_main["DEFAULT_PH_SHIFT"]           # Force Lower to be 0 phase Contribution when calculating
 
-        max_min_check(ph_mes)                               # Check if we are on the threshold
+
 
     # UPPER REGION OF OVERLAP
     elif index == PA_main["UPPER_REGION"]:
         ph_mes = 180                                        # Preset the Phase Shift to 180 degree offset
+
         ph_mes_up = ph_adc_pin.read_u16()                   # The upper is reading the phase offset from AD8302
+        # CONVERT THIS PHASE OFFSET FROM DIGITAL VOLTAGE
+        ph_mes_up = Senior_Project.dig_2_ana(ph_mes_up)
+
+        max_min_check(ph_mes_up)                            # Check if the voltage is at max or min threshold
+
         ph_mes_down = PA_main["DEFAULT_PH_SHIFT"]           # No Contribution
 
-        max_min_check()
+
 
     # LOWER REGION OF OVERLAP
     elif index == PA_main["LOWER_REGION"]:
@@ -272,9 +311,15 @@ while True:
         ph_mes_up = PA_main["DEFAULT_PH_SHIFT"]             # No Contribution
         ph_mes_down = ph_adc_pin.read_u16()                 # The lower half becomes the ADC Read Pin now
 
-    mag_mes = mag_adc_pin.read_u16()
-
+        max_min_check(ph_mes_down)
     # CONVERT PHASE DIGITAL VALUE TO ANALOG
+
+    if flag != 0:                                           # Check if there was a change instance. If so then skip calcualtion
+        mag_mes = mag_adc_pin.read_u16()                    # We have the Phase Offset Measurement now for the magnitude measurements
+
+        # HAVE TO CALCULATE THE OVERALL PHASE OFFSET
+        # we can use the index to help indicate what calculations we have to do
+        # use a function
 
 
     ####################################################################
@@ -283,21 +328,21 @@ while True:
 
 
 
-
-    # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
-    ph_mes = Senior_Project.volt_2_ph(ph_mes)           # This should make ph_mes in degrees
-
-
-    # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
-    ph_dif  = abs(ph_cal - ph_mes)                      # Calculate the phase
-    print('Phase Difference: ', ph_dif)
-    mag_dif = mag_cal - mag_mes
-    print('Magnitude Difference: ',mag_dif)
-
-    # CALCULATE PHASE ARRAY
-    theta = Senior_Project.Phase_array_calc(ph_dif)
-    print('Theta: ', theta)
-    # Display direction to user
-    heading = Senior_Project.dir_to_heading(theta, mag_dif)
-    Senior_Project.dis_head(heading)
-    utime.sleep(2)
+    #
+    # # USE CONVERSION FORMULA FOR VOLTAGE -> PHASE
+    # ph_mes = Senior_Project.volt_2_ph(ph_mes)           # This should make ph_mes in degrees
+    #
+    #
+    # # CALCULATE PHASE DIFFERENCE FOR PHASE ARRAY CALC
+    # ph_dif  = abs(ph_cal - ph_mes)                      # Calculate the phase
+    # print('Phase Difference: ', ph_dif)
+    # mag_dif = mag_cal - mag_mes
+    # print('Magnitude Difference: ',mag_dif)
+    #
+    # # CALCULATE PHASE ARRAY
+    # theta = Senior_Project.Phase_array_calc(ph_dif)
+    # print('Theta: ', theta)
+    # # Display direction to user
+    # heading = Senior_Project.dir_to_heading(theta, mag_dif)
+    # Senior_Project.dis_head(heading)
+    # utime.sleep(2)

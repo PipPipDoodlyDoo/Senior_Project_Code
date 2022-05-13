@@ -52,7 +52,7 @@ def phase_offset_calculation(index, current_phase, calibrated_phase):
 # PHASE ARRAY CALCULATION: (Relative to drone's flying direction)
 def Phase_array_calc(phase):
     phase = math.radians(phase)
-    theta = (phase * Library.MAIN_LIB["NUM_ELEM"] * Library.MAIN_LIB["LAMBDA"])/(2 * math.pi * Library.MAIN_LIB["DIST"])  # General Equation for Phase Array
+    theta = (phase * Library.MAIN_LIB["NUM_ELEM"] * Library.MAIN_LIB["LAMBDA"]) / (2 * math.pi * Library.MAIN_LIB["DIST"])  # General Equation for Phase Array
     theta = math.asin(theta)                                                                # Inverse Sine in radians
     theta = theta * 180 / math.pi                                                           # Convert to Degrees
     return theta

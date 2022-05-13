@@ -9,7 +9,7 @@ MAIN_LIB = {
     "CONFIRM_IN_PIN"    : 15,                           # Confirmation Input Pin for Pre-Measurement Protocol
     "DEBUG_OUT_PIN"     : 10,
     "DEBUG_IN_PIN"      : 11,
-    "PAUSE_TIME"        : 10,
+    "PAUSE_TIME"        : 100,
     # Reference Pin
     "RISING_SLOPE"      : 1,
     "FALLING SLOPE"     : 0,

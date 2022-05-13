@@ -6,7 +6,6 @@ import Library
 # DIGITAL TO ANALOG CONVERTOR
 def dig_2_ana(dig_value):
     analog_value = Library.MAIN_LIB["REF_VOLT"] / Library.MAIN_LIB["BIT_RES"] * dig_value
-    print("\nAnalog Voltage: ", '{:2f}'.format(analog_value))         # print out the analog voltage
     return analog_value
 
 # ANALOG TO PHASE OFFSET CONVERTOR
@@ -29,7 +28,6 @@ def volt_2_ph(voltage):
     elif phase < 0:
         phase = 0
 
-    print('Phase Offset = ', phase)
     return phase
 
 def phase_offset_calculation(index, current_phase, calibrated_phase):

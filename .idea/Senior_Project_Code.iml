@@ -20,7 +20,7 @@
       <excludeFolder url="file://$MODULE_DIR$/ALT_CODE" />
       <excludeFolder url="file://$MODULE_DIR$/Pip_Code_Alt_Code" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="MicroPython" level="project" />
   </component>

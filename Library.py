@@ -10,6 +10,7 @@ MAIN_LIB = {
     "DEBUG_OUT_PIN"     : 10,
     "DEBUG_IN_PIN"      : 11,
     "PAUSE_TIME"        : 100,
+    "READ_TIME"         : 2,
     # Reference Pin
     "RISING_SLOPE"      : 1,
     "FALLING SLOPE"     : 0,
